@@ -63,7 +63,7 @@ export function BreadthSection({ data }: { data: BreadthDay[] }) {
                 </defs>
                 <CartesianGrid strokeDasharray="3 6" stroke="rgba(255,255,255,0.03)" vertical={false} />
                 <XAxis dataKey="date" tickFormatter={d => d.slice(5)} tick={tickStyle} axisLine={false} tickLine={false} interval="preserveStartEnd" dy={8} />
-                <YAxis tick={tickStyle} axisLine={false} tickLine={false} width={38} />
+                <YAxis tick={tickStyle} axisLine={false} tickLine={false} width={44} domain={['dataMin - 10', 'dataMax + 10']} />
                 <ReferenceLine y={0} stroke="rgba(255,255,255,0.1)" />
                 <Tooltip contentStyle={chartTooltipStyle} cursor={{ stroke: 'rgba(255,255,255,0.08)' }} />
                 <Area type="monotone" dataKey="spread" stroke="#00e676" fill="url(#spreadGrad)" strokeWidth={2} name="스프레드" dot={false} />

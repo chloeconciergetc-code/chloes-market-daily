@@ -50,7 +50,10 @@ export function ThemeMomentum({ data }: { data: ThemesData }) {
                     </td>
                     <td className="py-3.5 hidden sm:table-cell">
                       <BarFill value={t.changePercent} max={maxChange}
-                        color={isUp ? 'var(--color-up)' : 'var(--color-down)'} />
+                        color={isUp
+                          ? `rgba(0, ${Math.round(180 + 75 * Math.min(Math.abs(t.changePercent) / maxChange, 1))}, ${Math.round(80 + 38 * Math.min(Math.abs(t.changePercent) / maxChange, 1))}, 1)`
+                          : `rgba(255, ${Math.round(60 - 37 * Math.min(Math.abs(t.changePercent) / maxChange, 1))}, ${Math.round(100 - 32 * Math.min(Math.abs(t.changePercent) / maxChange, 1))}, 1)`
+                        } />
                     </td>
                     <td className="py-3.5 text-right">
                       <span className={`font-mono text-xs ${

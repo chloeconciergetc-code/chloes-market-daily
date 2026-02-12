@@ -325,7 +325,7 @@ def extract_scanner_newhigh(cur, latest):
             'close': float(r[2] or 0),
             'changePct': round(float(r[3] or 0), 1),
             'volume': float(r[4] or 0),
-            'marketCap': round(float(r[5] or 0) / 1e8, 0) if r[5] else 0,  # 억원
+            'marketCap': round(float(r[5] or 0), 0) if r[5] else 0,  # already in 억원 from DB
             'sector': r[6] or '',
         })
     
