@@ -11,14 +11,14 @@ function MetricCard({ title, value, unit, sub, signal, sparkData, sparkColor, de
   return (
     <GlassCard delay={delay} className="flex flex-col justify-between min-h-[120px]">
       <div className="flex items-center justify-between mb-3">
-        <span className="text-[10px] font-semibold tracking-wider uppercase text-[var(--text-tertiary)]">{title}</span>
+        <span className="text-xs font-semibold tracking-wider uppercase text-[var(--text-secondary)]">{title}</span>
         {signal && <SignalLight signal={signal} size="sm" />}
       </div>
       <div className="flex items-baseline gap-1.5">
         <span className="font-mono text-[28px] font-bold leading-none tracking-tight">{value}</span>
         {unit && <span className="text-xs text-[var(--text-tertiary)] font-medium">{unit}</span>}
       </div>
-      {sub && <div className="text-[var(--text-tertiary)] text-[11px] mt-1.5 leading-relaxed">{sub}</div>}
+      {sub && <div className="text-[var(--text-secondary)] text-sm mt-1.5 leading-relaxed">{sub}</div>}
       {sparkData && sparkData.length > 0 && (
         <div className="mt-auto pt-3">
           <Sparkline data={sparkData} color={sparkColor} width={120} height={24} />
@@ -41,7 +41,7 @@ function IndexCard({ label, data, delay = 0 }: { label: string; data: IndexChart
 
   return (
     <GlassCard delay={delay} className="flex flex-col justify-between min-h-[120px]">
-      <span className="text-[10px] font-semibold tracking-wider uppercase text-[var(--text-tertiary)] mb-2">{label}</span>
+      <span className="text-xs font-semibold tracking-wider uppercase text-[var(--text-secondary)] mb-2">{label}</span>
       <div className="font-mono text-[32px] font-bold leading-none tracking-tight" style={{ color }}>
         {last.c.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
       </div>
@@ -49,7 +49,7 @@ function IndexCard({ label, data, delay = 0 }: { label: string; data: IndexChart
         <span>{arrow} {Math.abs(change).toFixed(2)}</span>
         <span>({changeRate >= 0 ? '+' : ''}{changeRate.toFixed(2)}%)</span>
       </div>
-      <div className="text-[var(--text-tertiary)] text-[11px] mt-1.5">
+      <div className="text-[var(--text-secondary)] text-sm mt-1.5">
         거래량 {last.v.toLocaleString()}
       </div>
     </GlassCard>

@@ -13,7 +13,7 @@ const chartTooltipStyle = {
   boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
 }
 
-const tickStyle = { fill: 'rgba(255,255,255,0.22)', fontSize: 10, fontFamily: 'var(--font-mono)' }
+const tickStyle = { fill: 'rgba(255,255,255,0.45)', fontSize: 10, fontFamily: 'var(--font-mono)' }
 
 export function BreadthSection({ data }: { data: BreadthDay[] }) {
   return (

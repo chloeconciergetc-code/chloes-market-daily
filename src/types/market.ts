@@ -53,6 +53,7 @@ export interface ThemeItem {
 
 export interface ThemesData {
   top10: ThemeItem[]
+  bottom10?: ThemeItem[]
   heatmap: { name: string; value: number; change: number }[]
   total: number
 }

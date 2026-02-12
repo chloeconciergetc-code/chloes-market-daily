@@ -63,7 +63,7 @@ export function IndexCandlestickChart({ data, label, width = 600, height = 320 }
               <line x1={margin.left} x2={width - margin.right} y1={y} y2={y}
                 stroke="rgba(255,255,255,0.03)" strokeDasharray="2 4" />
               <text x={width - margin.right + 6} y={y + 3.5}
-                fill="var(--text-muted)" fontSize={8.5} fontFamily="var(--font-mono)">
+                fill="var(--text-secondary)" fontSize={10} fontFamily="var(--font-mono)" opacity={0.5}>
                 {val.toFixed(0)}
               </text>
             </g>

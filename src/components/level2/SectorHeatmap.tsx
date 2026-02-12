@@ -62,7 +62,7 @@ function CustomCell({ x, y, width, height, name, change, onHover, onLeave }: any
       {showText && (
         <text x={x + width / 2} y={y + height / 2 - (showChange ? 6 : 0)}
           textAnchor="middle" dominantBaseline="middle"
-          fill="rgba(255,255,255,0.9)" fontSize={width > 90 ? 11 : 9} fontWeight={600}
+          fill="rgba(255,255,255,0.9)" fontSize={width > 90 ? 11 : 10} fontWeight={600}
           fontFamily="var(--font-sans)">
           {name?.length > (width > 90 ? 14 : 8) ? name.slice(0, width > 90 ? 13 : 7) + '…' : name}
         </text>

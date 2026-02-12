@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useData } from './hooks/useMarketData'
 import { IndexCandlestickChart } from './components/charts/IndexCandlestickChart'
@@ -30,7 +31,56 @@ function Header({ date }: { date?: string }) {
       {date && (
         <p className="text-[var(--text-muted)] text-xs mt-1.5 font-mono tracking-wide">{date}</p>
       )}
+      <p className="text-[var(--text-tertiary)] text-[11px] mt-1 font-mono">
+        {date ? `${date} 15:30 장마감 기준` : '데이터 로딩 중...'}
+      </p>
     </motion.header>
+  )
+}
+
+const sections = [
+  { id: 'section-index', label: '지수' },
+  { id: 'section-pulse', label: '시장체온' },
+  { id: 'section-breadth', label: '시장폭' },
+  { id: 'section-themes', label: '테마' },
+  { id: 'section-newhigh', label: '신고가' },
+  { id: 'section-newlow', label: '신저가' },
+]
+
+function SectionNav() {
+  const [active, setActive] = useState('')
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries.filter(e => e.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)
+        if (visible.length > 0) setActive(visible[0].target.id)
+      },
+      { rootMargin: '-20% 0px -60% 0px', threshold: 0 }
+    )
+    sections.forEach(s => {
+      const el = document.getElementById(s.id)
+      if (el) observer.observe(el)
+    })
+    return () => observer.disconnect()
+  }, [])
+
+  return (
+    <nav className="sticky top-0 z-50 backdrop-blur-xl bg-[var(--bg-base)]/80 border-b border-white/[0.04] -mx-4 md:-mx-6 lg:-mx-8 px-4 md:px-6 lg:px-8">
+      <div className="flex items-center gap-1 py-2 overflow-x-auto scrollbar-hide max-w-[1440px] mx-auto">
+        {sections.map(s => (
+          <button key={s.id}
+            onClick={() => document.getElementById(s.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+            className={`px-3 py-1.5 text-xs font-semibold rounded-lg whitespace-nowrap transition-all duration-200 ${
+              active === s.id
+                ? 'bg-white/[0.1] text-white'
+                : 'text-white/40 hover:text-white/70 hover:bg-white/[0.04]'
+            }`}>
+            {s.label}
+          </button>
+        ))}
+      </div>
+    </nav>
   )
 }
 
@@ -61,9 +111,10 @@ export default function App() {
   return (
     <div className="min-h-screen px-4 py-6 md:px-6 lg:px-8 max-w-[1440px] mx-auto">
       <Header date={meta?.dataDate} />
+      <SectionNav />
 
       {/* Index Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-10">
+      <div id="section-index" className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-10 scroll-mt-16">
         {kospi && (
           <GlassCard delay={0.08}>
             <IndexCandlestickChart data={kospi} label="KOSPI" />
@@ -77,16 +128,16 @@ export default function App() {
       </div>
 
       {/* Level 1: Market Pulse */}
-      {summary && <div className="mb-10"><MarketPulse data={summary} kospi={kospi ?? undefined} kosdaq={kosdaq ?? undefined} breadth={breadth ?? undefined} /></div>}
+      {summary && <div id="section-pulse" className="mb-10 scroll-mt-16"><MarketPulse data={summary} kospi={kospi ?? undefined} kosdaq={kosdaq ?? undefined} breadth={breadth ?? undefined} /></div>}
 
       {/* Level 2: Direction */}
-      {breadth && <div className="mb-10"><BreadthSection data={breadth} /></div>}
+      {breadth && <div id="section-breadth" className="mb-10 scroll-mt-16"><BreadthSection data={breadth} /></div>}
       {themes && <div className="mb-10"><ThemeMomentum data={themes} /></div>}
       {themes && <div className="mb-10"><SectorHeatmap data={themes.heatmap} /></div>}
 
       {/* Level 3: Deep Dive */}
-      {newHighs && <div className="mb-10"><NewHighTable data={newHighs} /></div>}
-      {newLows && newLows.length > 0 && <div className="mb-10"><NewLowTable data={newLows} /></div>}
+      {newHighs && <div id="section-newhigh" className="mb-10 scroll-mt-16"><NewHighTable data={newHighs} /></div>}
+      {newLows && newLows.length > 0 && <div id="section-newlow" className="mb-10 scroll-mt-16"><NewLowTable data={newLows} /></div>}
 
       <Footer />
     </div>
