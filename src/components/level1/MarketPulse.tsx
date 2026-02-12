@@ -80,7 +80,7 @@ export function MarketPulse({ data, kospi, kosdaq, breadth }: { data: MarketSumm
   return (
     <div>
       <SectionHeader icon="🌡️" title="시장 체온계" subtitle="Market Pulse" delay={0.08} />
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         <MetricCard
           title="상승 종목" value={latest.up.toLocaleString()} unit="종목" delay={0.1}
           sparkColor="var(--color-up)"
@@ -102,6 +102,14 @@ export function MarketPulse({ data, kospi, kosdaq, breadth }: { data: MarketSumm
           sparkData={tvSpark}
           sparkColor="var(--color-blue)"
         />
+        {data.tradingConcentration && (
+          <MetricCard
+            title="거래대금 집중도" delay={0.25}
+            value={`${data.tradingConcentration.top10.toFixed(1)}%`}
+            sub={`상위 10종목 | TOP 20: ${data.tradingConcentration.top20.toFixed(1)}%`}
+            signal={data.tradingConcentration.top10 >= 50 ? 'red' : data.tradingConcentration.top10 >= 35 ? 'yellow' : 'green'}
+          />
+        )}
         <MetricCard
           title="52주 신고/저" delay={0.26}
           value={breadth ? `${breadth[breadth.length - 1]?.newHighs ?? 0}` : '—'}

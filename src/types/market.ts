@@ -32,6 +32,7 @@ export interface MarketSummary {
   tradingValueAvg20d: number
   tradingValueRatio: number
   signals: { adr: Signal; tradingValue: Signal }
+  tradingConcentration?: { top10: number; top20: number }
 }
 
 export interface BreadthDay {
@@ -49,6 +50,16 @@ export interface ThemeItem {
   syncRate: number
   stockCount: number
   topStocks: string[]
+  prevRank?: number | null        // Phase 2: 전일 순위
+  tradingValueConc?: number       // Phase 2: 거래대금 집중도 (%)
+  totalMarketCap?: number         // Phase 2: 테마 시총 합계
+}
+
+export interface SectorPerf {
+  name: string
+  changePercent: number
+  totalMarketCap: number
+  stockCount: number
 }
 
 export interface ThemesData {
@@ -56,6 +67,31 @@ export interface ThemesData {
   bottom10?: ThemeItem[]
   heatmap: { name: string; value: number; change: number }[]
   total: number
+  sectorPerformance?: SectorPerf[] // Phase 2: 섹터별 등락률
+}
+
+// Phase 3: Investor Flow
+export interface InvestorFlowDay {
+  date: string
+  foreign: number      // 억원
+  institution: number  // 억원
+  individual: number   // 억원
+  otherCorp: number    // 억원
+}
+
+export interface InvestorFlowData {
+  kospi: InvestorFlowDay[]
+  kosdaq: InvestorFlowDay[]
+}
+
+// Phase 3: Market Regime
+export interface MarketRegimeData {
+  date: string
+  composite: number
+  regime: string
+  label: string
+  components: Record<string, number>
+  weights: Record<string, number>
 }
 
 export interface ScannerStock {
@@ -66,4 +102,5 @@ export interface ScannerStock {
   volume: number
   marketCap: number
   sector: string
+  volRatio?: number | null  // Phase 2: 거래량 / 20일 평균
 }

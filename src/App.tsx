@@ -2,15 +2,18 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useData } from './hooks/useMarketData'
 import { IndexCandlestickChart } from './components/charts/IndexCandlestickChart'
-// import { IndexSummary } from './components/level1/IndexSummary'
+import { IndexOverlayChart } from './components/charts/IndexOverlayChart'
 import { MarketPulse } from './components/level1/MarketPulse'
+import { MarketRegime } from './components/level1/MarketRegime'
 import { BreadthSection } from './components/level2/BreadthChart'
+import { InvestorFlow } from './components/level2/InvestorFlow'
 import { ThemeMomentum } from './components/level2/ThemeMomentum'
 import { SectorHeatmap } from './components/level2/SectorHeatmap'
+import { SectorPerformance } from './components/level2/SectorPerformance'
 import { NewHighTable } from './components/level3/NewHighTable'
 import { NewLowTable } from './components/level3/NewLowTable'
 import { GlassCard } from './components/ui/GlassCard'
-import type { IndexChartData, MarketSummary, BreadthDay, ThemesData, ScannerStock } from './types/market'
+import type { IndexChartData, MarketSummary, BreadthDay, ThemesData, ScannerStock, InvestorFlowData, MarketRegimeData } from './types/market'
 
 function Header({ date }: { date?: string }) {
   return (
@@ -40,9 +43,12 @@ function Header({ date }: { date?: string }) {
 
 const sections = [
   { id: 'section-index', label: '지수' },
-  { id: 'section-pulse', label: '시장체온' },
+  { id: 'section-regime', label: '시장체온' },
+  { id: 'section-pulse', label: '펄스' },
+  { id: 'section-investor', label: '수급' },
   { id: 'section-breadth', label: '시장폭' },
   { id: 'section-themes', label: '테마' },
+  { id: 'section-sector', label: '섹터' },
   { id: 'section-newhigh', label: '신고가' },
   { id: 'section-newlow', label: '신저가' },
 ]
@@ -107,6 +113,8 @@ export default function App() {
   const themes = useData<ThemesData>('themes.json')
   const newHighs = useData<ScannerStock[]>('scanner-newhigh.json')
   const newLows = useData<ScannerStock[]>('scanner-newlow.json')
+  const investorFlow = useData<InvestorFlowData>('investor-flow.json')
+  const regime = useData<MarketRegimeData>('market-regime.json')
 
   return (
     <div className="min-h-screen px-4 py-6 md:px-6 lg:px-8 max-w-[1440px] mx-auto">
@@ -114,7 +122,7 @@ export default function App() {
       <SectionNav />
 
       {/* Index Charts */}
-      <div id="section-index" className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-16 scroll-mt-16">
+      <div id="section-index" className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8 scroll-mt-16">
         {kospi && (
           <GlassCard delay={0.08}>
             <IndexCandlestickChart data={kospi} label="KOSPI" />
@@ -127,13 +135,29 @@ export default function App() {
         )}
       </div>
 
+      {/* KOSPI vs KOSDAQ Overlay */}
+      {kospi && kosdaq && (
+        <div className="mb-16">
+          <GlassCard delay={0.16}>
+            <IndexOverlayChart kospi={kospi} kosdaq={kosdaq} />
+          </GlassCard>
+        </div>
+      )}
+
+      {/* Level 1: Market Regime */}
+      {regime && <div id="section-regime" className="mb-16 scroll-mt-16"><MarketRegime data={regime} /></div>}
+
       {/* Level 1: Market Pulse */}
       {summary && <div id="section-pulse" className="mb-16 scroll-mt-16"><MarketPulse data={summary} kospi={kospi ?? undefined} kosdaq={kosdaq ?? undefined} breadth={breadth ?? undefined} /></div>}
+
+      {/* Level 2: Investor Flow */}
+      {investorFlow && <div id="section-investor" className="mb-16 scroll-mt-16"><InvestorFlow data={investorFlow} /></div>}
 
       {/* Level 2: Direction */}
       {breadth && <div id="section-breadth" className="mb-16 scroll-mt-16"><BreadthSection data={breadth} /></div>}
       {themes && <div className="mb-16"><ThemeMomentum data={themes} /></div>}
       {themes && <div className="mb-16"><SectorHeatmap data={themes.heatmap} /></div>}
+      {themes?.sectorPerformance && <div className="mb-16"><SectorPerformance data={themes.sectorPerformance} /></div>}
 
       {/* Level 3: Deep Dive */}
       {newHighs && <div id="section-newhigh" className="mb-16 scroll-mt-16"><NewHighTable data={newHighs} /></div>}

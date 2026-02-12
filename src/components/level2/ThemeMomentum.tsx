@@ -24,6 +24,7 @@ function ThemeTable({ items, isRising, maxChange }: { items: ThemeItem[]; isRisi
             <th className="text-right py-3.5 pr-3">등락률</th>
             <th className="text-center py-3.5 w-24 hidden sm:table-cell"></th>
             <th className="text-right py-3.5">동조율</th>
+            <th className="text-right py-3.5 hidden md:table-cell">거래집중</th>
             <th className="text-right py-3.5 hidden md:table-cell">종목수</th>
             <th className="text-left py-3.5 pl-5 hidden lg:table-cell">대장주</th>
             <th className="w-5"></th>
@@ -37,7 +38,19 @@ function ThemeTable({ items, isRising, maxChange }: { items: ThemeItem[]; isRisi
                 className={`border-t border-white/[0.04] hover:bg-white/[0.03] transition-colors duration-200 group ${
                   !isRising ? 'bg-[rgba(255,23,68,0.03)]' : ''
                 }`}>
-                <td className="py-3.5 px-5 font-mono text-[var(--text-muted)] text-xs">{i + 1}</td>
+                <td className="py-3.5 px-5 font-mono text-[var(--text-muted)] text-xs">
+                  <span>{i + 1}</span>
+                  {t.prevRank != null && (
+                    <span className={`ml-1 text-[9px] ${
+                      t.prevRank > (i + 1) ? 'text-[var(--color-up)]' :
+                      t.prevRank < (i + 1) ? 'text-[var(--color-down)]' :
+                      'text-[var(--text-muted)]'
+                    }`}>
+                      {t.prevRank > (i + 1) ? `▲${t.prevRank - (i + 1)}` :
+                       t.prevRank < (i + 1) ? `▼${(i + 1) - t.prevRank}` : '-'}
+                    </span>
+                  )}
+                </td>
                 <td className="py-3.5">
                   <span className="font-medium text-[var(--text-primary)] group-hover:text-white transition-colors">{t.name}</span>
                 </td>
@@ -60,6 +73,15 @@ function ThemeTable({ items, isRising, maxChange }: { items: ThemeItem[]; isRisi
                     'text-[var(--text-secondary)]'
                   }`}>
                     {t.syncRate}%
+                  </span>
+                </td>
+                <td className="py-3.5 text-right font-mono text-xs hidden md:table-cell">
+                  <span className={
+                    (t.tradingValueConc ?? 0) >= 5 ? 'text-[var(--color-up)] font-semibold' :
+                    (t.tradingValueConc ?? 0) >= 2 ? 'text-[var(--text-secondary)]' :
+                    'text-[var(--text-muted)]'
+                  }>
+                    {t.tradingValueConc != null ? `${t.tradingValueConc}%` : '-'}
                   </span>
                 </td>
                 <td className="py-3.5 text-right text-[var(--text-tertiary)] font-mono text-xs hidden md:table-cell">{t.stockCount}</td>

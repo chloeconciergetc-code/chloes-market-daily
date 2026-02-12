@@ -7,6 +7,7 @@ import math
 import psycopg2
 from dotenv import load_dotenv
 import yfinance as yf
+from pykrx import stock as pykrx_stock
 
 load_dotenv('/Users/home_mac_mini/.openclaw/workspace/kospi200_etl/.env')
 
@@ -318,20 +319,111 @@ def extract_themes(cur, latest):
                 'topStocks': top_stocks,
             })
     
+    # Phase 2: 거래대금 집중도 계산 (테마별 거래대금 / 전체 거래대금)
+    cur.execute("""
+        SELECT COALESCE(SUM(close * volume), 0) FROM market.daily_bars
+        WHERE trade_date = %s AND volume > 0 AND close > 0
+    """, (latest,))
+    total_trade_val = float(cur.fetchone()[0] or 1)
+    
+    for ts in theme_scores:
+        tickers = theme_tickers.get(ts['name'], [])
+        if tickers:
+            placeholders = ','.join(['%s'] * len(tickers))
+            cur.execute(f"""
+                SELECT COALESCE(SUM(close * volume), 0)
+                FROM market.daily_bars
+                WHERE trade_date = %s AND ticker IN ({placeholders}) AND volume > 0
+            """, [latest] + tickers)
+            theme_tv = float(cur.fetchone()[0] or 0)
+            ts['tradingValueConc'] = round(theme_tv / total_trade_val * 100, 2)
+        else:
+            ts['tradingValueConc'] = 0
+    
+    # Phase 2: 테마별 시총 합계 (히트맵 size용)
+    for ts in theme_scores:
+        tickers = theme_tickers.get(ts['name'], [])
+        if tickers:
+            placeholders = ','.join(['%s'] * len(tickers))
+            cur.execute(f"""
+                SELECT COALESCE(SUM(market_cap), 0)
+                FROM market.market_caps
+                WHERE trade_date = %s AND ticker IN ({placeholders})
+            """, [latest] + tickers)
+            ts['totalMarketCap'] = round(float(cur.fetchone()[0] or 0), 0)
+        else:
+            ts['totalMarketCap'] = 0
+    
+    # Phase 2: prevRank 계산 (전일 기준 테마 순위)
+    prev_ranks = {}
+    cur.execute("SELECT DISTINCT trade_date FROM market.daily_bars WHERE trade_date < %s ORDER BY trade_date DESC LIMIT 1", (latest,))
+    prev2_row = cur.fetchone()
+    if prev2_row:
+        prev2_date = prev2_row[0]
+        # 전일 이전 거래일
+        cur.execute("SELECT DISTINCT trade_date FROM market.daily_bars WHERE trade_date < %s ORDER BY trade_date DESC LIMIT 1", (prev2_date,))
+        prev3_row = cur.fetchone()
+        if prev3_row:
+            prev3_date = prev3_row[0]
+            # 전일 테마 등락률 계산
+            prev_theme_rets = []
+            for theme_name, tickers in theme_tickers.items():
+                if len(tickers) < 3:
+                    continue
+                placeholders = ','.join(['%s'] * len(tickers))
+                cur.execute(f"""
+                    SELECT AVG(CASE WHEN b.close > 0 AND p.close > 0 THEN (b.close - p.close) / p.close * 100 END)
+                    FROM market.daily_bars b
+                    JOIN market.daily_bars p ON p.ticker = b.ticker AND p.trade_date = %s
+                    WHERE b.trade_date = %s AND b.ticker IN ({placeholders}) AND b.volume > 0
+                """, [prev3_date, prev2_date] + tickers)
+                row = cur.fetchone()
+                if row and row[0] is not None:
+                    prev_theme_rets.append((theme_name, float(row[0])))
+            prev_theme_rets.sort(key=lambda x: x[1], reverse=True)
+            for i, (name, _) in enumerate(prev_theme_rets):
+                prev_ranks[name] = i + 1
+    
     # Sort by avg return
     theme_scores.sort(key=lambda x: x['changePercent'], reverse=True)
     
-    # Add rank
+    # Add rank + prevRank
     for i, t in enumerate(theme_scores):
         t['rank'] = i + 1
+        t['prevRank'] = prev_ranks.get(t['name'])  # Phase 2: 전일 순위
     
-    # Heatmap data: top 25 + bottom 25 for balanced view
+    # Phase 2: Heatmap - size를 시총 기반으로
     top_25 = theme_scores[:25]
     bottom_25 = theme_scores[-25:] if len(theme_scores) > 25 else []
-    # Merge and deduplicate
     heatmap_themes = top_25 + [t for t in bottom_25 if t not in top_25]
-    heatmap = [{'name': t['name'], 'value': max(abs(t['changePercent']), 0.1), 'change': t['changePercent']} 
+    heatmap = [{'name': t['name'], 
+                'value': max(t.get('totalMarketCap', 0), 1),  # Phase 2: 시총 기반 size
+                'change': t['changePercent']} 
                for t in heatmap_themes]
+    
+    # Phase 2: 섹터별 등락률 계산
+    sector_performance = []
+    cur.execute("""
+        SELECT mc.sector_name,
+            AVG(CASE WHEN b.close > 0 AND p.close > 0 THEN (b.close - p.close) / p.close * 100 END) as avg_ret,
+            SUM(mc.market_cap) as total_cap,
+            COUNT(*) as cnt
+        FROM market.market_caps mc
+        JOIN market.daily_bars b ON b.ticker = mc.ticker AND b.trade_date = mc.trade_date
+        JOIN market.daily_bars p ON p.ticker = b.ticker AND p.trade_date = %s
+        WHERE mc.trade_date = %s AND mc.sector_name IS NOT NULL AND mc.sector_name != ''
+        AND b.volume > 0
+        GROUP BY mc.sector_name
+        HAVING COUNT(*) >= 3
+        ORDER BY avg_ret DESC
+    """, (prev_date, latest))
+    for r in cur.fetchall():
+        sector_performance.append({
+            'name': r[0],
+            'changePercent': round(float(r[1] or 0), 2),
+            'totalMarketCap': round(float(r[2] or 0), 0),
+            'stockCount': int(r[3]),
+        })
     
     # Bottom 10 (worst performing)
     bottom10 = theme_scores[-10:][::-1] if len(theme_scores) >= 10 else []
@@ -341,30 +433,43 @@ def extract_themes(cur, latest):
         'bottom10': bottom10,
         'heatmap': heatmap,
         'total': len(theme_scores),
+        'sectorPerformance': sector_performance,  # Phase 2: 섹터별 등락률
     })
 
 # ─── SCANNER: 52-WEEK NEW HIGHS (Level 3) ───
 def extract_scanner_newhigh(cur, latest):
     cur.execute("""
         SELECT w.ticker, w.name, w.close, w.change_pct, w.volume,
-            mc.market_cap, mc.sector_name
+            mc.market_cap, mc.sector_name,
+            COALESCE(avg20.avg_vol, 0) as avg_vol_20d
         FROM market.weekly_52_extremes w
         LEFT JOIN market.market_caps mc ON mc.ticker = w.ticker AND mc.trade_date = %s
+        LEFT JOIN LATERAL (
+            SELECT AVG(sub.volume) as avg_vol FROM (
+                SELECT volume FROM market.daily_bars d
+                WHERE d.ticker = w.ticker AND d.trade_date < %s AND d.volume > 0
+                ORDER BY d.trade_date DESC LIMIT 20
+            ) sub
+        ) avg20 ON true
         WHERE w.trade_date = %s AND w.extreme_type = 'high'
         AND w.volume > 0 AND w.volume IS NOT NULL
         ORDER BY mc.market_cap DESC NULLS LAST
-    """, (latest, latest))
+    """, (latest, latest, latest))
     
     rows = []
     for r in cur.fetchall():
+        vol = float(r[4] or 0)
+        avg_vol = float(r[7] or 0)
+        vol_ratio = round(vol / avg_vol, 1) if avg_vol > 0 else None
         rows.append({
             'ticker': r[0],
             'name': r[1] or '',
             'close': float(r[2] or 0),
             'changePct': round(float(r[3] or 0), 1),
-            'volume': float(r[4] or 0),
-            'marketCap': round(float(r[5] or 0), 0) if r[5] else 0,  # already in 억원 from DB
+            'volume': vol,
+            'marketCap': round(float(r[5] or 0), 0) if r[5] else 0,
             'sector': r[6] or '',
+            'volRatio': vol_ratio,  # Phase 2: 거래량 대비 20일 평균
         })
     
     save('scanner-newhigh.json', rows)
@@ -395,6 +500,184 @@ def extract_scanner_newlow(cur, latest):
     
     save('scanner-newlow.json', rows)
 
+# ─── INVESTOR FLOW (Phase 3) ───
+def extract_investor_flow(cur, latest, trade_dates):
+    """외국인/기관 수급 데이터 수집 (pykrx)."""
+    recent_20 = trade_dates[-20:]
+    fmt = lambda d: d.strftime('%Y%m%d')
+
+    start_str = fmt(recent_20[0])
+    end_str = fmt(recent_20[-1])
+
+    result = {'kospi': [], 'kosdaq': []}
+
+    for market, key in [('KOSPI', 'kospi'), ('KOSDAQ', 'kosdaq')]:
+        try:
+            df_val = pykrx_stock.get_market_trading_value_by_date(start_str, end_str, market)
+            if df_val.empty:
+                continue
+            for idx, row in df_val.iterrows():
+                td = idx.date() if hasattr(idx, 'date') else idx
+                result[key].append({
+                    'date': td.isoformat(),
+                    'foreign': round(float(row.get('외국인합계', 0)) / 1e8, 0),   # 억원
+                    'institution': round(float(row.get('기관합계', 0)) / 1e8, 0),
+                    'individual': round(float(row.get('개인', 0)) / 1e8, 0),
+                    'otherCorp': round(float(row.get('기타법인', 0)) / 1e8, 0),
+                })
+        except Exception as e:
+            print(f"  ⚠️ Investor flow {market} error: {e}")
+
+    save('investor-flow.json', result)
+
+
+# ─── MARKET REGIME (Phase 3) ───
+def extract_market_regime(cur, latest, trade_dates, breadth_data=None):
+    """시장 체온 종합 점수 계산.
+    Components (0-100 each, weighted):
+      - ADR (20%): advance/decline ratio
+      - Breadth (20%): % above MA20
+      - New High/Low spread (15%)
+      - Trading value vs 20d avg (15%)
+      - Foreign flow (15%): 5-day cumulative
+      - Volatility (15%): inverse of recent volatility
+    """
+    # Get latest summary data
+    cur.execute("""
+        SELECT 
+            COUNT(*) FILTER (WHERE b.close > prev.close),
+            COUNT(*) FILTER (WHERE b.close < prev.close)
+        FROM market.daily_bars b
+        JOIN LATERAL (
+            SELECT close FROM market.daily_bars p 
+            WHERE p.ticker = b.ticker AND p.trade_date < %s 
+            ORDER BY p.trade_date DESC LIMIT 1
+        ) prev ON true
+        WHERE b.trade_date = %s AND b.volume > 0
+    """, (latest, latest))
+    row = cur.fetchone()
+    up, down = int(row[0] or 0), int(row[1] or 0)
+    adr = up / max(down, 1)
+
+    # ADR score: 0.5→0, 1.0→50, 2.0→100
+    adr_score = min(max((adr - 0.5) / 1.5 * 100, 0), 100)
+
+    # Breadth: % above MA20
+    cur.execute("""
+        WITH stock_ma AS (
+            SELECT b.ticker, b.close, AVG(b2.close) as ma20
+            FROM market.daily_bars b
+            JOIN market.daily_bars b2 ON b2.ticker = b.ticker 
+                AND b2.trade_date <= %s AND b2.trade_date > %s - interval '30 days'
+            WHERE b.trade_date = %s AND b.volume > 0
+            GROUP BY b.ticker, b.close HAVING COUNT(b2.*) >= 15
+        )
+        SELECT COUNT(*) FILTER (WHERE close > ma20), COUNT(*) FROM stock_ma
+    """, (latest, latest, latest))
+    br = cur.fetchone()
+    breadth_pct = 100 * int(br[0] or 0) / max(int(br[1] or 1), 1)
+    breadth_score = min(max(breadth_pct, 0), 100)
+
+    # New High/Low spread score
+    cur.execute("""
+        SELECT 
+            COUNT(*) FILTER (WHERE extreme_type = 'high'),
+            COUNT(*) FILTER (WHERE extreme_type = 'low')
+        FROM market.weekly_52_extremes WHERE trade_date = %s
+    """, (latest,))
+    hl = cur.fetchone()
+    highs, lows = int(hl[0] or 0), int(hl[1] or 0)
+    hl_ratio = highs / max(highs + lows, 1)
+    hl_score = hl_ratio * 100
+
+    # Trading value ratio
+    cur.execute("""
+        SELECT SUM(close * volume) / 1e12 FROM market.daily_bars
+        WHERE trade_date = %s AND volume > 0
+    """, (latest,))
+    tv_today = float(cur.fetchone()[0] or 0)
+    cur.execute("""
+        SELECT AVG(daily_tv) FROM (
+            SELECT trade_date, SUM(close * volume) / 1e12 as daily_tv
+            FROM market.daily_bars WHERE trade_date <= %s AND volume > 0 
+              AND volume IS NOT NULL AND volume != 'NaN' AND close > 0
+            GROUP BY trade_date ORDER BY trade_date DESC LIMIT 20
+        ) sub WHERE daily_tv IS NOT NULL AND daily_tv != 'NaN'
+    """, (latest,))
+    tv_avg_row = cur.fetchone()
+    tv_avg = float(tv_avg_row[0]) if tv_avg_row and tv_avg_row[0] and not math.isnan(float(tv_avg_row[0])) else 0
+    tv_ratio = tv_today / max(tv_avg, 0.01) if tv_today and tv_avg else 1.0
+    # 0.5→0, 1.0→50, 1.5→100
+    tv_score = min(max((tv_ratio - 0.5) * 100, 0), 100)
+
+    # Foreign flow: 5-day cumulative (pykrx)
+    recent_5 = trade_dates[-5:]
+    foreign_score = 50  # default neutral
+    try:
+        df = pykrx_stock.get_market_trading_value_by_date(
+            recent_5[0].strftime('%Y%m%d'), recent_5[-1].strftime('%Y%m%d'), 'KOSPI')
+        if not df.empty:
+            cum_foreign = float(df['외국인합계'].sum()) / 1e8  # 억원
+            # Normalize: -5000억→0, 0→50, +5000억→100
+            foreign_score = min(max((cum_foreign / 5000 + 1) * 50, 0), 100)
+    except:
+        pass
+
+    # Volatility (inverse): low vol = bullish
+    cur.execute("""
+        SELECT STDDEV(daily_ret) FROM (
+            SELECT (close - prev_c) / NULLIF(prev_c, 0) * 100 as daily_ret FROM (
+                SELECT close, LAG(close) OVER (ORDER BY trade_date) as prev_c
+                FROM (SELECT trade_date, AVG(close) as close FROM market.daily_bars 
+                      WHERE trade_date >= %s - interval '20 days' AND trade_date <= %s AND volume > 0
+                      GROUP BY trade_date ORDER BY trade_date) sub
+            ) sub2 WHERE prev_c IS NOT NULL
+        ) sub3
+    """, (latest, latest))
+    vol_row = cur.fetchone()
+    volatility = float(vol_row[0] or 1) if vol_row and vol_row[0] else 1
+    # Low vol (0.5) → 100, High vol (3.0) → 0
+    vol_score = min(max((3.0 - volatility) / 2.5 * 100, 0), 100)
+
+    # Weighted composite
+    weights = {'adr': 0.20, 'breadth': 0.20, 'hlSpread': 0.15, 'tradingValue': 0.15, 'foreignFlow': 0.15, 'volatility': 0.15}
+    components = {
+        'adr': round(adr_score, 1),
+        'breadth': round(breadth_score, 1),
+        'hlSpread': round(hl_score, 1),
+        'tradingValue': round(tv_score, 1),
+        'foreignFlow': round(foreign_score, 1),
+        'volatility': round(vol_score, 1),
+    }
+    composite = sum((components[k] or 50) * weights[k] for k in weights)
+
+    # Regime label
+    if composite >= 70:
+        regime = 'risk-on'
+        label = '🟢 Risk-On (강세)'
+    elif composite >= 55:
+        regime = 'neutral-bullish'
+        label = '🟡 중립-강세'
+    elif composite >= 45:
+        regime = 'neutral'
+        label = '⚪ 중립'
+    elif composite >= 30:
+        regime = 'neutral-bearish'
+        label = '🟠 중립-약세'
+    else:
+        regime = 'risk-off'
+        label = '🔴 Risk-Off (약세)'
+
+    save('market-regime.json', {
+        'date': latest.isoformat(),
+        'composite': round(composite, 1),
+        'regime': regime,
+        'label': label,
+        'components': components,
+        'weights': weights,
+    })
+
+
 # ─── MAIN ───
 def main():
     print("📊 Extracting market data...")
@@ -413,6 +696,8 @@ def main():
     extract_themes(cur, latest)
     extract_scanner_newhigh(cur, latest)
     extract_scanner_newlow(cur, latest)
+    extract_investor_flow(cur, latest, trade_dates)
+    extract_market_regime(cur, latest, trade_dates)
     
     conn.close()
     print("✅ All data extracted!")

@@ -42,7 +42,8 @@ export function NewHighTable({ data }: { data: ScannerStock[] }) {
                 <th className="text-right py-2.5 min-w-[100px]">종가</th>
                 <th className="text-right py-2.5">등락률</th>
                 <th className="text-right py-2.5 hidden md:table-cell">시총</th>
-                <th className="text-right py-2.5 pr-5 hidden lg:table-cell">거래량</th>
+                <th className="text-right py-2.5 hidden lg:table-cell">거래량</th>
+                <th className="text-right py-2.5 pr-5 hidden xl:table-cell">Vol배율</th>
               </tr>
             </thead>
             <tbody>
@@ -66,8 +67,15 @@ export function NewHighTable({ data }: { data: ScannerStock[] }) {
                   <td className="py-3.5 text-right text-[var(--text-tertiary)] font-mono text-xs hidden md:table-cell">
                     {fmtMarketCap(s.marketCap)}
                   </td>
-                  <td className="py-3.5 text-right text-[var(--text-muted)] font-mono text-xs pr-5 hidden lg:table-cell">
+                  <td className="py-3.5 text-right text-[var(--text-muted)] font-mono text-xs hidden lg:table-cell">
                     {fmtVolume(s.volume)}
+                  </td>
+                  <td className={`py-3.5 text-right font-mono text-xs pr-5 hidden xl:table-cell font-semibold ${
+                    s.volRatio && s.volRatio >= 3 ? 'text-[var(--color-up)]' :
+                    s.volRatio && s.volRatio >= 1.5 ? 'text-[var(--text-secondary)]' :
+                    'text-[var(--text-muted)]'
+                  }`}>
+                    {s.volRatio != null ? <>{s.volRatio >= 2 && '🔥 '}{s.volRatio}x</> : '-'}
                   </td>
                 </motion.tr>
               ))}
