@@ -27,7 +27,7 @@ export function BreadthSection({ data }: { data: BreadthDay[] }) {
           </div>
           <div className="w-full" style={{ height: 220 }}>
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={data} margin={{ top: 8, right: 8, bottom: 4, left: 0 }}>
+              <AreaChart data={data} margin={{ top: 8, right: 8, bottom: 4, left: 4 }}>
                 <defs>
                   <linearGradient id="breadthGrad" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="#42a5f5" stopOpacity={0.25} />
@@ -36,7 +36,7 @@ export function BreadthSection({ data }: { data: BreadthDay[] }) {
                 </defs>
                 <CartesianGrid strokeDasharray="3 6" stroke="rgba(255,255,255,0.03)" vertical={false} />
                 <XAxis dataKey="date" tickFormatter={d => d.slice(5)} tick={tickStyle} axisLine={false} tickLine={false} interval="preserveStartEnd" dy={8} />
-                <YAxis domain={[0, 100]} tick={tickStyle} axisLine={false} tickLine={false} tickFormatter={v => `${v}%`} width={38} />
+                <YAxis domain={[0, 100]} tick={tickStyle} axisLine={false} tickLine={false} tickFormatter={v => `${v}%`} width={46} />
                 <ReferenceLine y={50} stroke="rgba(255,255,255,0.08)" strokeDasharray="4 4" />
                 <ReferenceLine y={70} stroke="rgba(255,23,68,0.2)" strokeDasharray="3 3" label={{ value: '과열', position: 'right', fill: 'rgba(255,23,68,0.35)', fontSize: 9 }} />
                 <ReferenceLine y={30} stroke="rgba(0,230,118,0.2)" strokeDasharray="3 3" label={{ value: '침체', position: 'right', fill: 'rgba(0,230,118,0.35)', fontSize: 9 }} />
@@ -54,7 +54,7 @@ export function BreadthSection({ data }: { data: BreadthDay[] }) {
           </div>
           <div className="w-full" style={{ height: 220 }}>
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={data} margin={{ top: 8, right: 8, bottom: 4, left: 0 }}>
+              <AreaChart data={data} margin={{ top: 8, right: 8, bottom: 4, left: 4 }}>
                 <defs>
                   <linearGradient id="spreadGrad" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="#00e676" stopOpacity={0.2} />
@@ -63,7 +63,7 @@ export function BreadthSection({ data }: { data: BreadthDay[] }) {
                 </defs>
                 <CartesianGrid strokeDasharray="3 6" stroke="rgba(255,255,255,0.03)" vertical={false} />
                 <XAxis dataKey="date" tickFormatter={d => d.slice(5)} tick={tickStyle} axisLine={false} tickLine={false} interval="preserveStartEnd" dy={8} />
-                <YAxis tick={tickStyle} axisLine={false} tickLine={false} width={44} domain={['dataMin - 10', 'dataMax + 10']} />
+                <YAxis tick={tickStyle} axisLine={false} tickLine={false} width={48} domain={[(min: number) => Math.floor(min - 20), (max: number) => Math.ceil(max + 20)]} />
                 <ReferenceLine y={0} stroke="rgba(255,255,255,0.1)" />
                 <Tooltip contentStyle={chartTooltipStyle} cursor={{ stroke: 'rgba(255,255,255,0.08)' }} />
                 <Area type="monotone" dataKey="spread" stroke="#00e676" fill="url(#spreadGrad)" strokeWidth={2} name="스프레드" dot={false} />

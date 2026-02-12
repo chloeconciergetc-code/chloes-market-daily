@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { GlassCard } from '../ui/GlassCard'
 import { SectionHeader } from '../ui/SectionHeader'
-import { fmtNum, fmtMarketCap } from '../../lib/format'
+import { fmtNum, fmtMarketCap, fmtVolume } from '../../lib/format'
 import type { ScannerStock } from '../../types/market'
 
 const sortLabels = { marketCap: '시총', changePct: '등락률', volume: '거래량' } as const
@@ -58,7 +58,7 @@ export function NewHighTable({ data }: { data: ScannerStock[] }) {
                       <span className="text-[9px] text-[var(--text-muted)] font-mono opacity-0 group-hover:opacity-100 transition-opacity">{s.ticker}</span>
                     </div>
                   </td>
-                  <td className="py-3 text-right font-mono text-xs">{fmtNum(s.close)}</td>
+                  <td className="py-3 text-right font-mono text-xs">{fmtNum(s.close)}원</td>
                   <td className={`py-3 text-right font-mono text-xs font-semibold ${s.changePct >= 0 ? 'text-[var(--color-up)]' : 'text-[var(--color-down)]'}`}>
                     {s.changePct > 0 ? '+' : ''}{s.changePct.toFixed(1)}%
                   </td>
@@ -66,7 +66,7 @@ export function NewHighTable({ data }: { data: ScannerStock[] }) {
                     {fmtMarketCap(s.marketCap)}
                   </td>
                   <td className="py-3 text-right text-[var(--text-muted)] font-mono text-xs pr-5 hidden lg:table-cell">
-                    {fmtNum(s.volume)}
+                    {fmtVolume(s.volume)}
                   </td>
                 </motion.tr>
               ))}
