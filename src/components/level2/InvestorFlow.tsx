@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { scaleLinear } from 'd3-scale'
-import { GlassCard } from '../ui/GlassCard'
+import { Card } from '../ui/Card'
 import { SectionHeader } from '../ui/SectionHeader'
 import type { InvestorFlowData, InvestorFlowDay } from '../../types/market'
 
@@ -8,7 +8,7 @@ type Market = 'kospi' | 'kosdaq'
 
 const colors = {
   foreign: '#3b82f6',
-  institution: '#8b5cf6',
+  institution: '#a855f7',
   individual: '#f97316',
 }
 
@@ -26,14 +26,12 @@ function BarChart({ data, width = 600, height = 220 }: { data: InvestorFlowDay[]
 
   return (
     <svg viewBox={`0 0 ${width} ${height}`} className="w-full" preserveAspectRatio="xMidYMid meet">
-      {/* Zero line */}
       <line x1={margin.left} x2={width - margin.right} y1={margin.top + yScale(0)} y2={margin.top + yScale(0)}
         stroke="rgba(255,255,255,0.1)" strokeWidth={1} />
 
-      {/* Y axis labels */}
       {[-absMax, -absMax / 2, 0, absMax / 2, absMax].map((v, i) => (
         <text key={i} x={margin.left - 4} y={margin.top + yScale(v) + 3}
-          fill="var(--text-tertiary)" fontSize={9} fontFamily="var(--font-mono)" textAnchor="end">
+          fill="var(--text-tertiary)" fontSize={10} fontFamily="var(--font-mono)" textAnchor="end">
           {(v / 10000).toFixed(v === 0 ? 0 : 1)}조
         </text>
       ))}
@@ -45,7 +43,7 @@ function BarChart({ data, width = 600, height = 220 }: { data: InvestorFlowDay[]
         const drawBar = (val: number, offset: number, color: string) => {
           const h = Math.abs(yScale(0) - yScale(val))
           const y = val >= 0 ? zero - h : zero
-          return <rect key={offset} x={x + offset * (barW + 2)} y={y} width={barW} height={Math.max(h, 1)} fill={color} opacity={0.8} rx={1} />
+          return <rect key={offset} x={x + offset * (barW + 2)} y={y} width={barW} height={Math.max(h, 1)} fill={color} opacity={0.75} rx={1.5} />
         }
 
         return (
@@ -54,19 +52,18 @@ function BarChart({ data, width = 600, height = 220 }: { data: InvestorFlowDay[]
             {drawBar(d.institution, 1, colors.institution)}
             {drawBar(d.individual, 2, colors.individual)}
             <text x={x + barGroupW * 0.35} y={height - 4}
-              fill="var(--text-tertiary)" fontSize={8} fontFamily="var(--font-mono)" textAnchor="middle">
+              fill="var(--text-muted)" fontSize={9} fontFamily="var(--font-mono)" textAnchor="middle">
               {d.date.slice(5)}
             </text>
           </g>
         )
       })}
 
-      {/* Legend */}
       <g transform={`translate(${margin.left + 2}, 10)`}>
         {[['외국인', colors.foreign], ['기관', colors.institution], ['개인', colors.individual]].map(([label, c], i) => (
-          <g key={i} transform={`translate(${i * 60}, 0)`}>
+          <g key={i} transform={`translate(${i * 64}, 0)`}>
             <rect x={0} y={-4} width={8} height={8} fill={c as string} rx={2} />
-            <text x={12} y={4} fill="var(--text-secondary)" fontSize={9}>{label}</text>
+            <text x={12} y={4} fill="var(--text-secondary)" fontSize={10}>{label}</text>
           </g>
         ))}
       </g>
@@ -97,10 +94,12 @@ function SummaryCards({ data }: { data: InvestorFlowDay[] }) {
         { label: '기관', today: latest.institution, cum: cum5.institution },
         { label: '개인', today: latest.individual, cum: cum5.individual },
       ].map(({ label, today, cum }) => (
-        <div key={label} className="bg-white/[0.03] rounded-lg p-3 text-center">
-          <div className="text-[10px] text-[var(--text-tertiary)] uppercase tracking-wider mb-1">{label}</div>
-          <div className={`font-mono text-lg font-bold ${cls(today)}`}>{fmt(today)}</div>
-          <div className="text-[10px] text-[var(--text-secondary)] mt-0.5">5일 누적 <span className={`font-mono font-semibold ${cls(cum)}`}>{fmt(cum)}</span></div>
+        <div key={label} className="bg-[var(--bg-elevated)] rounded-[var(--radius-md)] p-3.5 text-center">
+          <div className="text-[var(--text-tertiary)] uppercase tracking-wider mb-1" style={{ fontSize: 'var(--text-label)' }}>{label}</div>
+          <div className={`font-mono font-bold ${cls(today)}`} style={{ fontSize: '1.125rem' }}>{fmt(today)}</div>
+          <div className="text-[var(--text-secondary)] mt-0.5" style={{ fontSize: 'var(--text-label)' }}>
+            5일 누적 <span className={`font-mono font-semibold ${cls(cum)}`}>{fmt(cum)}</span>
+          </div>
         </div>
       ))}
     </div>
@@ -113,21 +112,22 @@ export function InvestorFlow({ data }: { data: InvestorFlowData }) {
 
   return (
     <div>
-      <SectionHeader icon="💰" title="투자자별 매매동향" subtitle="Investor Flow" delay={0.06} />
-      <GlassCard delay={0.1}>
+      <SectionHeader title="투자자별 매매동향" subtitle="Investor Flow" />
+      <Card>
         <div className="flex items-center gap-2 mb-4">
           {(['kospi', 'kosdaq'] as Market[]).map(m => (
             <button key={m} onClick={() => setMarket(m)}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${
-                market === m ? 'bg-white/[0.12] text-white' : 'text-white/40 hover:text-white/70'
-              }`}>
+              className={`px-3.5 py-1.5 font-semibold rounded-[var(--radius-md)] transition-all ${
+                market === m ? 'bg-[var(--bg-elevated)] text-[var(--text-primary)]' : 'text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]'
+              }`}
+              style={{ fontSize: 'var(--text-body)' }}>
               {m.toUpperCase()}
             </button>
           ))}
         </div>
         <SummaryCards data={flows} />
         <BarChart data={flows} />
-      </GlassCard>
+      </Card>
     </div>
   )
 }

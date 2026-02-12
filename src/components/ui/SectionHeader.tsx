@@ -1,18 +1,11 @@
-import { motion } from 'framer-motion'
-
-export function SectionHeader({ icon: _icon, title, subtitle, delay = 0 }: {
+export function SectionHeader({ title, subtitle }: {
   icon?: string; title: string; subtitle?: string; delay?: number
 }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, x: -8 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.4, delay }}
-      className="flex items-baseline gap-2.5 mb-6 pt-8"
-    >
-      <div className="w-1 h-5 rounded-full bg-gradient-to-b from-[var(--color-accent)] to-[var(--color-accent)]/30 translate-y-[1px]" />
-      <h2 className="text-lg font-bold text-[var(--text-primary)] tracking-tight">{title}</h2>
-      {subtitle && <span className="text-[11px] text-[var(--text-muted)] font-mono">{subtitle}</span>}
-    </motion.div>
+    <div className="flex items-baseline gap-3 mb-5 pt-6">
+      <div className="w-1 h-5 rounded-full bg-[var(--color-accent)] shrink-0 translate-y-[1px]" />
+      <h2 className="text-[var(--text-headline)] font-bold text-[var(--text-primary)] tracking-tight leading-tight" style={{ fontSize: 'var(--text-headline)' }}>{title}</h2>
+      {subtitle && <span className="text-[var(--text-caption)] text-[var(--text-tertiary)] font-mono" style={{ fontSize: 'var(--text-caption)' }}>{subtitle}</span>}
+    </div>
   )
 }

@@ -6,7 +6,7 @@ export function DeltaBadge({ value, suffix = '%' }: { value: number; suffix?: st
   const arrow = isUp ? '↑' : isDown ? '↓' : ''
 
   return (
-    <span className={`inline-flex items-center gap-0.5 px-2 py-0.5 rounded-md text-xs font-mono font-medium ${bg} ${text}`}>
+    <span className={`inline-flex items-center gap-0.5 px-2 py-0.5 rounded-md font-mono font-semibold ${bg} ${text}`} style={{ fontSize: 'var(--text-label)' }}>
       {arrow}{Math.abs(value).toFixed(2)}{suffix}
     </span>
   )

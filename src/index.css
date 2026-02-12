@@ -19,22 +19,8 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
-  line-height: 1.5;
+  line-height: 1.6;
   overflow-x: hidden;
-}
-
-/* Ambient background */
-body::before {
-  content: '';
-  position: fixed;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background:
-    radial-gradient(ellipse 800px 600px at 30% 30%, rgba(108, 92, 231, 0.04), transparent);
-  pointer-events: none;
-  z-index: 0;
 }
 
 #root {
@@ -56,7 +42,7 @@ body::before {
 
 /* ── Selection ── */
 ::selection {
-  background: rgba(108, 92, 231, 0.3);
+  background: rgba(99, 102, 241, 0.35);
   color: white;
 }
 
@@ -65,11 +51,11 @@ body::before {
 .text-down { color: var(--color-down); }
 .text-flat { color: var(--color-flat); }
 
-/* ── Section title ── */
-.section-label {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--text-tertiary);
+/* ── Scrollbar hide for nav ── */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }

@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { scaleLinear } from 'd3-scale'
-import { motion } from 'framer-motion'
 import type { IndexChartData } from '../../types/market'
 
 interface Props {
@@ -25,7 +24,6 @@ export function IndexCandlestickChart({ data, label, width = 600, height = 320 }
   const yMin = Math.min(...candles.map(c => c.l)) * 0.997
   const yMax = Math.max(...candles.map(c => c.h)) * 1.003
   const yScale = scaleLinear().domain([yMin, yMax]).range([chartH, margin.top])
-  // Use 95th percentile for vMax to prevent outlier distortion
   const sortedVols = candles.map(c => c.v).sort((a, b) => a - b)
   const vMax = sortedVols[Math.floor(sortedVols.length * 0.95)] || 1
   const vScale = scaleLinear().domain([0, vMax]).range([0, volH]).clamp(true)
@@ -41,50 +39,47 @@ export function IndexCandlestickChart({ data, label, width = 600, height = 320 }
   const dayChangePct = prevCandle.c ? ((dayChange / prevCandle.c) * 100) : 0
   const isUp = dayChange >= 0
 
-  // Y-axis ticks
   const yTicks = Array.from({ length: 4 }, (_, i) => yMin + (yMax - yMin) * (i + 0.5) / 4)
 
   return (
     <div>
-      {/* Header */}
       <div className="flex items-baseline gap-3 mb-4">
-        <span className="text-xs font-semibold tracking-wider text-[var(--text-tertiary)] uppercase">{label}</span>
-        <span className="font-mono text-2xl font-bold tracking-tight">{lastCandle.c.toLocaleString()}</span>
-        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-mono font-medium
-          ${isUp ? 'bg-[var(--color-up-soft)] text-[var(--color-up)]' : 'bg-[var(--color-down-soft)] text-[var(--color-down)]'}`}>
+        <span className="font-semibold tracking-wide text-[var(--text-tertiary)] uppercase" style={{ fontSize: 'var(--text-label)' }}>{label}</span>
+        <span className="font-mono font-bold tracking-tight" style={{ fontSize: '1.5rem' }}>{lastCandle.c.toLocaleString()}</span>
+        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md font-mono font-medium
+          ${isUp ? 'bg-[var(--color-up-soft)] text-[var(--color-up)]' : 'bg-[var(--color-down-soft)] text-[var(--color-down)]'}`}
+          style={{ fontSize: 'var(--text-label)' }}>
           {isUp ? '↑' : '↓'} {Math.abs(dayChange).toLocaleString()} ({dayChangePct > 0 ? '+' : ''}{dayChangePct.toFixed(2)}%)
         </span>
         <button onClick={() => setShowMA(v => !v)}
-          className={`ml-auto px-2.5 py-1 text-[10px] font-semibold tracking-wide uppercase rounded-lg transition-all duration-200 ${
-            showMA ? 'bg-white/[0.08] text-white' : 'text-white/40 hover:text-white/60 hover:bg-white/[0.03]'
-          }`}>
+          className={`ml-auto px-2.5 py-1 font-semibold tracking-wide uppercase rounded-[var(--radius-sm)] transition-all duration-200 ${
+            showMA ? 'bg-[var(--bg-elevated)] text-[var(--text-primary)]' : 'text-[var(--text-muted)] hover:text-[var(--text-tertiary)] hover:bg-[var(--bg-subtle)]'
+          }`}
+          style={{ fontSize: 'var(--text-micro)' }}>
           MA
         </button>
       </div>
 
       <svg viewBox={`0 0 ${width} ${height}`} className="w-full" preserveAspectRatio="xMidYMid meet">
-        {/* Grid + Y labels */}
         {yTicks.map((val, i) => {
           const y = yScale(val)
           return (
             <g key={i}>
               <line x1={margin.left} x2={width - margin.right} y1={y} y2={y}
-                stroke="rgba(255,255,255,0.03)" strokeDasharray="2 4" />
+                stroke="rgba(255,255,255,0.04)" strokeDasharray="2 4" />
               <text x={width - margin.right + 6} y={y + 3.5}
-                fill="var(--text-secondary)" fontSize={10} fontFamily="var(--font-mono)" opacity={0.5}>
+                fill="var(--text-tertiary)" fontSize={10} fontFamily="var(--font-mono)">
                 {val.toFixed(0)}
               </text>
             </g>
           )
         })}
 
-        {/* MA lines */}
         {showMA && <>
-          <path d={makePath(ma20)} fill="none" stroke="#3b82f6" strokeWidth={1.5} opacity={0.7} strokeLinecap="round" />
-          <path d={makePath(ma60)} fill="none" stroke="#f97316" strokeWidth={1.5} opacity={0.7} strokeLinecap="round" />
+          <path d={makePath(ma20)} fill="none" stroke="var(--color-blue)" strokeWidth={1.5} opacity={0.7} strokeLinecap="round" />
+          <path d={makePath(ma60)} fill="none" stroke="var(--color-orange)" strokeWidth={1.5} opacity={0.7} strokeLinecap="round" />
         </>}
 
-        {/* Candles */}
         {candles.map((c, i) => {
           const up = c.c >= c.o
           const color = up ? 'var(--color-up)' : 'var(--color-down)'
@@ -102,7 +97,6 @@ export function IndexCandlestickChart({ data, label, width = 600, height = 320 }
           )
         })}
 
-        {/* Volume bars */}
         {candles.map((c, i) => {
           const up = c.c >= c.o
           return (
@@ -118,7 +112,6 @@ export function IndexCandlestickChart({ data, label, width = 600, height = 320 }
           )
         })}
 
-        {/* Latest price tag */}
         <g>
           <rect x={width - margin.right + 1} y={yScale(lastCandle.c) - 9} width={52} height={18} rx={4}
             fill={isUp ? 'var(--color-up)' : 'var(--color-down)'} />
@@ -126,21 +119,19 @@ export function IndexCandlestickChart({ data, label, width = 600, height = 320 }
             fill="white" fontSize={9} textAnchor="middle" fontFamily="var(--font-mono)" fontWeight="600">
             {lastCandle.c.toLocaleString()}
           </text>
-          {/* Dotted line to price tag */}
           <line x1={xScale(candles.length - 1)} x2={width - margin.right + 1}
             y1={yScale(lastCandle.c)} y2={yScale(lastCandle.c)}
             stroke={isUp ? 'var(--color-up)' : 'var(--color-down)'}
             strokeWidth={0.5} strokeDasharray="2 2" opacity={0.5} />
         </g>
 
-        {/* MA Legend */}
         {showMA && (
           <g transform={`translate(${margin.left + 2}, ${margin.top - 6})`}>
-            <rect x={-2} y={-6} width={100} height={14} rx={4} fill="rgba(0,0,0,0.3)" />
-            <line x1={2} x2={14} y1={0} y2={0} stroke="#3b82f6" strokeWidth={1.5} strokeLinecap="round" />
-            <text x={18} y={3} fill="var(--text-tertiary)" fontSize={8} fontFamily="var(--font-mono)">MA20</text>
-            <line x1={50} x2={62} y1={0} y2={0} stroke="#f97316" strokeWidth={1.5} strokeLinecap="round" />
-            <text x={66} y={3} fill="var(--text-tertiary)" fontSize={8} fontFamily="var(--font-mono)">MA60</text>
+            <rect x={-2} y={-6} width={100} height={14} rx={4} fill="rgba(0,0,0,0.4)" />
+            <line x1={2} x2={14} y1={0} y2={0} stroke="var(--color-blue)" strokeWidth={1.5} strokeLinecap="round" />
+            <text x={18} y={3} fill="var(--text-tertiary)" fontSize={9} fontFamily="var(--font-mono)">MA20</text>
+            <line x1={50} x2={62} y1={0} y2={0} stroke="var(--color-orange)" strokeWidth={1.5} strokeLinecap="round" />
+            <text x={66} y={3} fill="var(--text-tertiary)" fontSize={9} fontFamily="var(--font-mono)">MA60</text>
           </g>
         )}
       </svg>

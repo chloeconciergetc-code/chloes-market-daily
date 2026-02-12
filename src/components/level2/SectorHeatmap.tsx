@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Treemap, ResponsiveContainer } from 'recharts'
-import { GlassCard } from '../ui/GlassCard'
+import { Card } from '../ui/Card'
 import { SectionHeader } from '../ui/SectionHeader'
 
 interface HeatmapItem {
@@ -9,22 +9,23 @@ interface HeatmapItem {
   change: number
 }
 
-function HeatmapTooltip({ active, payload }: { active?: { name: string; change: number; x: number; y: number }; payload?: any }) {
+function HeatmapTooltip({ active }: { active?: { name: string; change: number; x: number; y: number } }) {
   if (!active) return null
   return (
     <div
-      className="fixed z-50 pointer-events-none px-3 py-2 rounded-lg text-xs font-mono"
+      className="fixed z-50 pointer-events-none px-3 py-2 rounded-[var(--radius-md)] font-mono"
       style={{
         left: active.x,
         top: active.y - 48,
-        background: 'rgba(12,12,20,0.96)',
-        border: '1px solid rgba(255,255,255,0.1)',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+        background: 'var(--bg-card)',
+        border: '1px solid var(--border-default)',
+        boxShadow: 'var(--shadow-elevated)',
         transform: 'translateX(-50%)',
+        fontSize: 'var(--text-body)',
       }}
     >
-      <div className="text-white/90 font-semibold mb-0.5" style={{ fontFamily: 'var(--font-sans)' }}>{active.name}</div>
-      <div className={active.change >= 0 ? 'text-[#00e676]' : 'text-[#ff1744]'}>
+      <div className="text-[var(--text-primary)] font-semibold mb-0.5" style={{ fontFamily: 'var(--font-sans)' }}>{active.name}</div>
+      <div className={active.change >= 0 ? 'text-[var(--color-up)]' : 'text-[var(--color-down)]'}>
         {active.change > 0 ? '+' : ''}{active.change.toFixed(2)}%
       </div>
     </div>
@@ -36,16 +37,10 @@ function CustomCell({ x, y, width, height, name, change, onHover, onLeave }: any
 
   const intensity = Math.min(1, Math.abs(change) / 4)
   const color = change > 0
-    ? `rgba(0, 230, 118, ${0.7 + intensity * 0.15})`
+    ? `rgba(34, 197, 94, ${0.55 + intensity * 0.25})`
     : change < 0
-    ? `rgba(255, 23, 68, ${0.7 + intensity * 0.15})`
+    ? `rgba(239, 68, 68, ${0.55 + intensity * 0.25})`
     : 'rgba(255,255,255,0.04)'
-
-  const textColor = change > 0
-    ? `rgba(0, 230, 118, ${0.7 + intensity * 0.3})`
-    : change < 0
-    ? `rgba(255, 23, 68, ${0.7 + intensity * 0.3})`
-    : 'rgba(255,255,255,0.3)'
 
   const showText = width > 48 && height > 28
   const showChange = width > 56 && height > 38
@@ -57,20 +52,20 @@ function CustomCell({ x, y, width, height, name, change, onHover, onLeave }: any
       onMouseLeave={() => onLeave?.()}
       style={{ cursor: 'pointer' }}
     >
-      <rect x={x + 2} y={y + 2} width={width - 4} height={height - 4} rx={5}
-        fill={color} stroke="rgba(6,6,11,0.9)" strokeWidth={1.5} />
+      <rect x={x + 2} y={y + 2} width={width - 4} height={height - 4} rx={4}
+        fill={color} stroke="var(--bg-base)" strokeWidth={1.5} />
       {showText && (
         <text x={x + width / 2} y={y + height / 2 - (showChange ? 6 : 0)}
           textAnchor="middle" dominantBaseline="middle"
-          fill="rgba(255,255,255,0.9)" fontSize={width > 90 ? 11 : 10} fontWeight={600}
-          fontFamily="var(--font-sans)" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>
+          fill="rgba(255,255,255,0.92)" fontSize={width > 90 ? 12 : 11} fontWeight={600}
+          fontFamily="var(--font-sans)">
           {name?.length > (width > 90 ? 14 : 8) ? name.slice(0, width > 90 ? 13 : 7) + '…' : name}
         </text>
       )}
       {showChange && (
         <text x={x + width / 2} y={y + height / 2 + 10}
           textAnchor="middle" dominantBaseline="middle"
-          fill={textColor} fontSize={9} fontFamily="var(--font-mono)" fontWeight={600} style={{ textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>
+          fill="rgba(255,255,255,0.7)" fontSize={10} fontFamily="var(--font-mono)" fontWeight={600}>
           {change > 0 ? '+' : ''}{change?.toFixed(1)}%
         </text>
       )}
@@ -84,8 +79,8 @@ export function SectorHeatmap({ data }: { data: HeatmapItem[] }) {
 
   return (
     <div>
-      <SectionHeader icon="🗺️" title="테마 히트맵" subtitle="Heatmap" delay={0.42} />
-      <GlassCard delay={0.45}>
+      <SectionHeader title="테마 히트맵" subtitle="Heatmap" />
+      <Card>
         <div className="w-full relative" style={{ height: 360 }}>
           <ResponsiveContainer width="100%" height="100%">
             <Treemap
@@ -93,13 +88,13 @@ export function SectorHeatmap({ data }: { data: HeatmapItem[] }) {
               dataKey="size"
               stroke="none"
               content={<CustomCell onHover={setTooltip} onLeave={() => setTooltip(null)} />}
-              animationDuration={800}
+              animationDuration={600}
               animationEasing="ease-out"
             />
           </ResponsiveContainer>
         </div>
         {tooltip && <HeatmapTooltip active={tooltip} />}
-      </GlassCard>
+      </Card>
     </div>
   )
 }
