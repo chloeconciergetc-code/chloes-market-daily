@@ -2,7 +2,7 @@ import { GlassCard } from '../ui/GlassCard'
 import { SignalLight } from '../ui/SignalLight'
 import { Sparkline } from '../ui/Sparkline'
 import { SectionHeader } from '../ui/SectionHeader'
-import type { MarketSummary } from '../../types/market'
+import type { MarketSummary, IndexChartData } from '../../types/market'
 
 function MetricCard({ title, value, unit, sub, signal, sparkData, sparkColor, delay = 0 }: {
   title: string; value: string; unit?: string; sub?: string; signal?: 'green' | 'yellow' | 'red'
@@ -28,7 +28,35 @@ function MetricCard({ title, value, unit, sub, signal, sparkData, sparkColor, de
   )
 }
 
-export function MarketPulse({ data }: { data: MarketSummary }) {
+function IndexCard({ label, data, delay = 0 }: { label: string; data: IndexChartData; delay?: number }) {
+  const last = data.candles[data.candles.length - 1]
+  const prev = data.candles[data.candles.length - 2]
+  if (!last || !prev) return null
+
+  const change = last.c - prev.c
+  const changeRate = ((change) / prev.c) * 100
+  const isUp = change >= 0
+  const color = isUp ? 'var(--color-up)' : 'var(--color-down)'
+  const arrow = isUp ? '▲' : '▼'
+
+  return (
+    <GlassCard delay={delay} className="flex flex-col justify-between min-h-[120px]">
+      <span className="text-[10px] font-semibold tracking-wider uppercase text-[var(--text-tertiary)] mb-2">{label}</span>
+      <div className="font-mono text-[32px] font-bold leading-none tracking-tight" style={{ color }}>
+        {last.c.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+      </div>
+      <div className="flex items-center gap-2 mt-2 text-[16px] font-mono font-semibold" style={{ color }}>
+        <span>{arrow} {Math.abs(change).toFixed(2)}</span>
+        <span>({changeRate >= 0 ? '+' : ''}{changeRate.toFixed(2)}%)</span>
+      </div>
+      <div className="text-[var(--text-tertiary)] text-[11px] mt-1.5">
+        거래량 {last.v.toLocaleString()}
+      </div>
+    </GlassCard>
+  )
+}
+
+export function MarketPulse({ data, kospi, kosdaq }: { data: MarketSummary; kospi?: IndexChartData; kosdaq?: IndexChartData }) {
   const { latest, sparkline, signals, tradingValueRatio } = data
   const adrSpark = sparkline.map(s => s.adr)
   const tvSpark = sparkline.map(s => s.tradingValue)
@@ -63,6 +91,14 @@ export function MarketPulse({ data }: { data: MarketSummary }) {
           sub="데이터 로딩 중"
         />
       </div>
+
+      {/* Index Cards */}
+      {(kospi || kosdaq) && (
+        <div className="grid grid-cols-2 gap-3 mt-4">
+          {kospi && <IndexCard label="KOSPI" data={kospi} delay={0.3} />}
+          {kosdaq && <IndexCard label="KOSDAQ" data={kosdaq} delay={0.34} />}
+        </div>
+      )}
     </div>
   )
 }

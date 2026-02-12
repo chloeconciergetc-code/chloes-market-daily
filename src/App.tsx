@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 import { useData } from './hooks/useMarketData'
 import { IndexCandlestickChart } from './components/charts/IndexCandlestickChart'
-import { IndexSummary } from './components/level1/IndexSummary'
+// import { IndexSummary } from './components/level1/IndexSummary'
 import { MarketPulse } from './components/level1/MarketPulse'
 import { BreadthSection } from './components/level2/BreadthChart'
 import { ThemeMomentum } from './components/level2/ThemeMomentum'
@@ -60,9 +60,6 @@ export default function App() {
     <div className="min-h-screen px-4 py-6 md:px-6 lg:px-8 max-w-[1440px] mx-auto">
       <Header date={meta?.dataDate} />
 
-      {/* Index Summary - Top Banner */}
-      {kospi && kosdaq && <IndexSummary kospi={kospi} kosdaq={kosdaq} />}
-
       {/* Index Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-10">
         {kospi && (
@@ -78,7 +75,7 @@ export default function App() {
       </div>
 
       {/* Level 1: Market Pulse */}
-      {summary && <div className="mb-10"><MarketPulse data={summary} /></div>}
+      {summary && <div className="mb-10"><MarketPulse data={summary} kospi={kospi ?? undefined} kosdaq={kosdaq ?? undefined} /></div>}
 
       {/* Level 2: Direction */}
       {breadth && <div className="mb-10"><BreadthSection data={breadth} /></div>}
