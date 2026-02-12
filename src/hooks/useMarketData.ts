@@ -1,11 +1,21 @@
-import { useState, useEffect } from 'react'
+import metaJson from '../data/meta.json'
+import kospiJson from '../data/index-kospi.json'
+import kosdaqJson from '../data/index-kosdaq.json'
+import summaryJson from '../data/market-summary.json'
+import breadthJson from '../data/breadth.json'
+import themesJson from '../data/themes.json'
+import newHighJson from '../data/scanner-newhigh.json'
 
-const BASE = import.meta.env.BASE_URL + 'data/'
+const dataMap: Record<string, unknown> = {
+  'meta.json': metaJson,
+  'index-kospi.json': kospiJson,
+  'index-kosdaq.json': kosdaqJson,
+  'market-summary.json': summaryJson,
+  'breadth.json': breadthJson,
+  'themes.json': themesJson,
+  'scanner-newhigh.json': newHighJson,
+}
 
 export function useData<T>(file: string): T | null {
-  const [data, setData] = useState<T | null>(null)
-  useEffect(() => {
-    fetch(BASE + file).then(r => r.json()).then(setData).catch(() => null)
-  }, [file])
-  return data
+  return (dataMap[file] as T) ?? null
 }
