@@ -2,7 +2,7 @@ import { GlassCard } from '../ui/GlassCard'
 import { SignalLight } from '../ui/SignalLight'
 import { Sparkline } from '../ui/Sparkline'
 import { SectionHeader } from '../ui/SectionHeader'
-import type { MarketSummary, IndexChartData } from '../../types/market'
+import type { MarketSummary, IndexChartData, BreadthDay } from '../../types/market'
 
 function MetricCard({ title, value, unit, sub, signal, sparkData, sparkColor, delay = 0 }: {
   title: string; value: string; unit?: string; sub?: string; signal?: 'green' | 'yellow' | 'red'
@@ -56,10 +56,11 @@ function IndexCard({ label, data, delay = 0 }: { label: string; data: IndexChart
   )
 }
 
-export function MarketPulse({ data, kospi, kosdaq }: { data: MarketSummary; kospi?: IndexChartData; kosdaq?: IndexChartData }) {
+export function MarketPulse({ data, kospi, kosdaq, breadth }: { data: MarketSummary; kospi?: IndexChartData; kosdaq?: IndexChartData; breadth?: BreadthDay[] }) {
   const { latest, sparkline, signals, tradingValueRatio } = data
   const adrSpark = sparkline.map(s => s.adr)
   const tvSpark = sparkline.map(s => s.tradingValue)
+  const tvRatio = tradingValueRatio ?? 0
 
   return (
     <div>
@@ -82,13 +83,18 @@ export function MarketPulse({ data, kospi, kosdaq }: { data: MarketSummary; kosp
         <MetricCard
           title="거래대금" value={latest.tradingValue.toFixed(1)} unit="조원" delay={0.22}
           signal={signals.tradingValue}
-          sub={`20일 평균 대비 ${(tradingValueRatio * 100).toFixed(0)}%`}
+          sub={tvRatio > 0 ? `20일 평균 대비 ${(tvRatio * 100).toFixed(0)}%` : undefined}
           sparkData={tvSpark}
           sparkColor="var(--color-blue)"
         />
         <MetricCard
-          title="52주 신고가" value="—" delay={0.26}
-          sub="데이터 로딩 중"
+          title="52주 신고/저" delay={0.26}
+          value={breadth ? `${breadth[breadth.length - 1]?.newHighs ?? 0}` : '—'}
+          sub={breadth ? `신저가 ${breadth[breadth.length - 1]?.newLows ?? 0}종목` : undefined}
+          signal={breadth ? (
+            (breadth[breadth.length - 1]?.spread ?? 0) > 10 ? 'green' :
+            (breadth[breadth.length - 1]?.spread ?? 0) < -10 ? 'red' : 'yellow'
+          ) : undefined}
         />
       </div>
 

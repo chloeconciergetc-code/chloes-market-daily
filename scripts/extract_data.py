@@ -319,12 +319,20 @@ def extract_themes(cur, latest):
     for i, t in enumerate(theme_scores):
         t['rank'] = i + 1
     
-    # Heatmap data (top 50 themes)
-    heatmap = [{'name': t['name'], 'value': abs(t['changePercent']), 'change': t['changePercent']} 
-               for t in theme_scores[:50]]
+    # Heatmap data: top 25 + bottom 25 for balanced view
+    top_25 = theme_scores[:25]
+    bottom_25 = theme_scores[-25:] if len(theme_scores) > 25 else []
+    # Merge and deduplicate
+    heatmap_themes = top_25 + [t for t in bottom_25 if t not in top_25]
+    heatmap = [{'name': t['name'], 'value': max(abs(t['changePercent']), 0.1), 'change': t['changePercent']} 
+               for t in heatmap_themes]
+    
+    # Bottom 10 (worst performing)
+    bottom10 = theme_scores[-10:][::-1] if len(theme_scores) >= 10 else []
     
     save('themes.json', {
         'top10': theme_scores[:10],
+        'bottom10': bottom10,
         'heatmap': heatmap,
         'total': len(theme_scores),
     })
@@ -355,6 +363,32 @@ def extract_scanner_newhigh(cur, latest):
     
     save('scanner-newhigh.json', rows)
 
+# ─── SCANNER: 52-WEEK NEW LOWS (Level 3) ───
+def extract_scanner_newlow(cur, latest):
+    cur.execute("""
+        SELECT w.ticker, w.name, w.close, w.change_pct, w.volume,
+            mc.market_cap, mc.sector_name
+        FROM market.weekly_52_extremes w
+        LEFT JOIN market.market_caps mc ON mc.ticker = w.ticker AND mc.trade_date = %s
+        WHERE w.trade_date = %s AND w.extreme_type = 'low'
+        AND w.volume > 0 AND w.volume IS NOT NULL
+        ORDER BY mc.market_cap DESC NULLS LAST
+    """, (latest, latest))
+    
+    rows = []
+    for r in cur.fetchall():
+        rows.append({
+            'ticker': r[0],
+            'name': r[1] or '',
+            'close': float(r[2] or 0),
+            'changePct': round(float(r[3] or 0), 1),
+            'volume': float(r[4] or 0),
+            'marketCap': round(float(r[5] or 0), 0) if r[5] else 0,
+            'sector': r[6] or '',
+        })
+    
+    save('scanner-newlow.json', rows)
+
 # ─── MAIN ───
 def main():
     print("📊 Extracting market data...")
@@ -372,6 +406,7 @@ def main():
     extract_breadth(cur, latest, trade_dates)
     extract_themes(cur, latest)
     extract_scanner_newhigh(cur, latest)
+    extract_scanner_newlow(cur, latest)
     
     conn.close()
     print("✅ All data extracted!")

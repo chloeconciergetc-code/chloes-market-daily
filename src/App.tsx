@@ -7,6 +7,7 @@ import { BreadthSection } from './components/level2/BreadthChart'
 import { ThemeMomentum } from './components/level2/ThemeMomentum'
 import { SectorHeatmap } from './components/level2/SectorHeatmap'
 import { NewHighTable } from './components/level3/NewHighTable'
+import { NewLowTable } from './components/level3/NewLowTable'
 import { GlassCard } from './components/ui/GlassCard'
 import type { IndexChartData, MarketSummary, BreadthDay, ThemesData, ScannerStock } from './types/market'
 
@@ -55,6 +56,7 @@ export default function App() {
   const breadth = useData<BreadthDay[]>('breadth.json')
   const themes = useData<ThemesData>('themes.json')
   const newHighs = useData<ScannerStock[]>('scanner-newhigh.json')
+  const newLows = useData<ScannerStock[]>('scanner-newlow.json')
 
   return (
     <div className="min-h-screen px-4 py-6 md:px-6 lg:px-8 max-w-[1440px] mx-auto">
@@ -75,7 +77,7 @@ export default function App() {
       </div>
 
       {/* Level 1: Market Pulse */}
-      {summary && <div className="mb-10"><MarketPulse data={summary} kospi={kospi ?? undefined} kosdaq={kosdaq ?? undefined} /></div>}
+      {summary && <div className="mb-10"><MarketPulse data={summary} kospi={kospi ?? undefined} kosdaq={kosdaq ?? undefined} breadth={breadth ?? undefined} /></div>}
 
       {/* Level 2: Direction */}
       {breadth && <div className="mb-10"><BreadthSection data={breadth} /></div>}
@@ -84,6 +86,7 @@ export default function App() {
 
       {/* Level 3: Deep Dive */}
       {newHighs && <div className="mb-10"><NewHighTable data={newHighs} /></div>}
+      {newLows && newLows.length > 0 && <div className="mb-10"><NewLowTable data={newLows} /></div>}
 
       <Footer />
     </div>

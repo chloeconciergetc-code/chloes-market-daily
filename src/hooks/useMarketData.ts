@@ -5,6 +5,7 @@ import summaryJson from '../data/market-summary.json'
 import breadthJson from '../data/breadth.json'
 import themesJson from '../data/themes.json'
 import newHighJson from '../data/scanner-newhigh.json'
+import newLowJson from '../data/scanner-newlow.json'
 
 const dataMap: Record<string, unknown> = {
   'meta.json': metaJson,
@@ -14,6 +15,7 @@ const dataMap: Record<string, unknown> = {
   'breadth.json': breadthJson,
   'themes.json': themesJson,
   'scanner-newhigh.json': newHighJson,
+  'scanner-newlow.json': newLowJson,
 }
 
 export function useData<T>(file: string): T | null {
