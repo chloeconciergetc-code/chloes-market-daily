@@ -3,6 +3,7 @@
 import json, os, sys
 from datetime import datetime, date, timedelta
 from decimal import Decimal
+import math
 import psycopg2
 from dotenv import load_dotenv
 import yfinance as yf
@@ -22,12 +23,26 @@ def get_conn():
 class DecimalEncoder(json.JSONEncoder):
     def default(self, o):
         if isinstance(o, Decimal):
-            return float(o)
+            f = float(o)
+            return None if (math.isnan(f) or math.isinf(f)) else f
         if isinstance(o, (date, datetime)):
             return o.isoformat()
+        if isinstance(o, float) and (math.isnan(o) or math.isinf(o)):
+            return None
         return super().default(o)
 
+def _sanitize(obj):
+    """Replace NaN/Infinity with None recursively."""
+    if isinstance(obj, float) and (math.isnan(obj) or math.isinf(obj)):
+        return None
+    if isinstance(obj, dict):
+        return {k: _sanitize(v) for k, v in obj.items()}
+    if isinstance(obj, (list, tuple)):
+        return [_sanitize(v) for v in obj]
+    return obj
+
 def save(name, data):
+    data = _sanitize(data)
     path = os.path.join(OUT_DIR, name)
     with open(path, 'w', encoding='utf-8') as f:
         json.dump(data, f, cls=DecimalEncoder, ensure_ascii=False)
@@ -74,9 +89,20 @@ def extract_index(cur, universe, latest, trade_dates):
     # Take last 60 trading days
     df = df.tail(60)
     
-    candles = []
+    # Collect raw volumes first, then normalize to 0-1 scale
+    raw_rows = []
     for idx, row in df.iterrows():
         td = idx.date() if hasattr(idx, 'date') else idx
+        raw_rows.append((td, row))
+    
+    raw_volumes = sorted([float(r[1]['Volume']) for r in raw_rows if r[1]['Volume'] > 0])
+    # Use 90th percentile as reference to avoid outlier distortion
+    max_vol = raw_volumes[int(len(raw_volumes) * 0.9)] if raw_volumes else 1
+    max_vol = max(max_vol, 1)
+    
+    candles = []
+    for td, row in raw_rows:
+        vol = float(row['Volume'])
         candles.append({
             'd': td.strftime('%m%d'),
             'date': td.isoformat(),
@@ -84,7 +110,7 @@ def extract_index(cur, universe, latest, trade_dates):
             'h': round(float(row['High']), 2),
             'l': round(float(row['Low']), 2),
             'c': round(float(row['Close']), 2),
-            'v': round(float(row['Volume']) / 1_000_000, 1) if row['Volume'] > 0 else None,
+            'v': round(vol / max_vol, 1) if vol > 0 else None,
         })
     
     # Compute MA20 / MA60
