@@ -1,11 +1,15 @@
 import { useState } from 'react'
+import { motion } from 'framer-motion'
 import { GlassCard } from '../ui/GlassCard'
+import { SectionHeader } from '../ui/SectionHeader'
 import { fmtNum, fmtMarketCap } from '../../lib/format'
 import type { ScannerStock } from '../../types/market'
 
+const sortLabels = { marketCap: '시총', changePct: '등락률', volume: '거래량' } as const
+
 export function NewHighTable({ data }: { data: ScannerStock[] }) {
   const [sortBy, setSortBy] = useState<'marketCap' | 'changePct' | 'volume'>('marketCap')
-  
+
   const sorted = [...data].sort((a, b) => {
     if (sortBy === 'changePct') return b.changePct - a.changePct
     if (sortBy === 'volume') return b.volume - a.volume
@@ -13,55 +17,61 @@ export function NewHighTable({ data }: { data: ScannerStock[] }) {
   })
 
   return (
-    <GlassCard delay={0.5}>
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm text-[var(--text-secondary)]">
-          ⭐ 52주 신고가 <span className="text-[var(--text-tertiary)]">총 {data.length}종목</span>
-        </h3>
-        <div className="flex gap-1">
-          {(['marketCap', 'changePct', 'volume'] as const).map(key => (
+    <div>
+      <SectionHeader icon="⭐" title="52주 신고가" subtitle={`${data.length}종목`} delay={0.48} />
+      <GlassCard delay={0.5} noPad>
+        {/* Sort buttons */}
+        <div className="flex items-center justify-end gap-1 px-5 pt-4 pb-2">
+          {(Object.keys(sortLabels) as Array<keyof typeof sortLabels>).map(key => (
             <button key={key} onClick={() => setSortBy(key)}
-              className={`px-2 py-1 text-xs rounded-md transition-colors ${
-                sortBy === key ? 'bg-white/10 text-white' : 'text-[var(--text-tertiary)] hover:text-white'
+              className={`px-3 py-1.5 text-[10px] font-semibold tracking-wide uppercase rounded-lg transition-all duration-200 ${
+                sortBy === key
+                  ? 'bg-white/[0.08] text-white shadow-[0_0_12px_rgba(255,255,255,0.05)]'
+                  : 'text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] hover:bg-white/[0.03]'
               }`}>
-              {key === 'marketCap' ? '시총' : key === 'changePct' ? '등락률' : '거래량'}
+              {sortLabels[key]}
             </button>
           ))}
         </div>
-      </div>
-      <div className="overflow-x-auto max-h-[400px] overflow-y-auto">
-        <table className="w-full text-sm">
-          <thead className="sticky top-0 bg-[var(--bg-base)]">
-            <tr className="text-[var(--text-tertiary)] text-xs border-b border-white/5">
-              <th className="text-left py-2">종목</th>
-              <th className="text-right py-2">종가</th>
-              <th className="text-right py-2">등락률</th>
-              <th className="text-right py-2 hidden md:table-cell">시총</th>
-              <th className="text-right py-2 hidden lg:table-cell">거래량</th>
-            </tr>
-          </thead>
-          <tbody>
-            {sorted.slice(0, 50).map(s => (
-              <tr key={s.ticker} className="border-b border-white/[0.03] hover:bg-white/[0.03] transition-colors">
-                <td className="py-2">
-                  <div className="font-medium">{s.name}</div>
-                  <div className="text-xs text-[var(--text-tertiary)]">{s.ticker}</div>
-                </td>
-                <td className="py-2 text-right font-mono">{fmtNum(s.close)}</td>
-                <td className={`py-2 text-right font-mono ${s.changePct >= 0 ? 'text-[var(--color-up)]' : 'text-[var(--color-down)]'}`}>
-                  {s.changePct > 0 ? '+' : ''}{s.changePct.toFixed(1)}%
-                </td>
-                <td className="py-2 text-right text-[var(--text-secondary)] font-mono hidden md:table-cell">
-                  {fmtMarketCap(s.marketCap)}
-                </td>
-                <td className="py-2 text-right text-[var(--text-tertiary)] font-mono hidden lg:table-cell">
-                  {fmtNum(s.volume)}
-                </td>
+
+        <div className="overflow-x-auto max-h-[420px] overflow-y-auto">
+          <table className="w-full text-sm">
+            <thead className="sticky top-0 z-10">
+              <tr className="text-[10px] font-semibold tracking-wider uppercase text-[var(--text-tertiary)] bg-[var(--bg-surface)]">
+                <th className="text-left py-2.5 px-5">종목</th>
+                <th className="text-right py-2.5">종가</th>
+                <th className="text-right py-2.5">등락률</th>
+                <th className="text-right py-2.5 hidden md:table-cell">시총</th>
+                <th className="text-right py-2.5 pr-5 hidden lg:table-cell">거래량</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </GlassCard>
+            </thead>
+            <tbody>
+              {sorted.slice(0, 50).map((s, i) => (
+                <motion.tr key={s.ticker}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.02 * Math.min(i, 20) }}
+                  className="border-t border-white/[0.03] hover:bg-white/[0.03] transition-colors duration-150 group">
+                  <td className="py-3 px-5">
+                    <div className="font-medium text-[var(--text-primary)] group-hover:text-white transition-colors">{s.name}</div>
+                    <div className="text-[10px] text-[var(--text-muted)] font-mono mt-0.5">{s.ticker}</div>
+                  </td>
+                  <td className="py-3 text-right font-mono text-xs">{fmtNum(s.close)}</td>
+                  <td className={`py-3 text-right font-mono text-xs font-semibold ${s.changePct >= 0 ? 'text-[var(--color-up)]' : 'text-[var(--color-down)]'}`}>
+                    {s.changePct > 0 ? '+' : ''}{s.changePct.toFixed(1)}%
+                  </td>
+                  <td className="py-3 text-right text-[var(--text-tertiary)] font-mono text-xs hidden md:table-cell">
+                    {fmtMarketCap(s.marketCap)}
+                  </td>
+                  <td className="py-3 text-right text-[var(--text-muted)] font-mono text-xs pr-5 hidden lg:table-cell">
+                    {fmtNum(s.volume)}
+                  </td>
+                </motion.tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </GlassCard>
+    </div>
   )
 }
