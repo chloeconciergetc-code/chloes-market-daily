@@ -110,7 +110,7 @@ def extract_index(cur, universe, latest, trade_dates):
             'h': round(float(row['High']), 2),
             'l': round(float(row['Low']), 2),
             'c': round(float(row['Close']), 2),
-            'v': round(vol / max_vol, 1) if vol > 0 else None,
+            'v': round(min(vol / max_vol, 3.0), 1) if vol > 0 else None,
         })
     
     # Compute MA20 / MA60

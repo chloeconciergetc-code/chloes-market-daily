@@ -23,8 +23,10 @@ export function IndexCandlestickChart({ data, label, width = 600, height = 320 }
   const yMin = Math.min(...candles.map(c => c.l)) * 0.997
   const yMax = Math.max(...candles.map(c => c.h)) * 1.003
   const yScale = scaleLinear().domain([yMin, yMax]).range([chartH, margin.top])
-  const vMax = Math.max(...candles.map(c => c.v))
-  const vScale = scaleLinear().domain([0, vMax]).range([0, volH])
+  // Use 95th percentile for vMax to prevent outlier distortion
+  const sortedVols = candles.map(c => c.v).sort((a, b) => a - b)
+  const vMax = sortedVols[Math.floor(sortedVols.length * 0.95)] || 1
+  const vScale = scaleLinear().domain([0, vMax]).range([0, volH]).clamp(true)
 
   const candleW = Math.max(2, innerW / candles.length * 0.6)
 
