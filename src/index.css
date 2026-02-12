@@ -32,9 +32,7 @@ body::before {
   width: 200%;
   height: 200%;
   background:
-    radial-gradient(ellipse 800px 600px at 20% 20%, rgba(108, 92, 231, 0.06), transparent),
-    radial-gradient(ellipse 600px 500px at 80% 80%, rgba(0, 230, 118, 0.03), transparent),
-    radial-gradient(ellipse 500px 400px at 60% 30%, rgba(66, 165, 245, 0.04), transparent);
+    radial-gradient(ellipse 800px 600px at 30% 30%, rgba(108, 92, 231, 0.04), transparent);
   pointer-events: none;
   z-index: 0;
 }

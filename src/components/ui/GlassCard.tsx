@@ -15,7 +15,7 @@ export function GlassCard({ children, className = '', delay = 0, noPad = false }
       className={`
         relative overflow-hidden
         rounded-[var(--radius-lg)]
-        ${noPad ? '' : 'p-5 md:p-6'}
+        ${noPad ? '' : 'p-6 md:p-7'}
         bg-[var(--bg-card)]
         backdrop-blur-[24px]
         border border-[var(--glass-border)]

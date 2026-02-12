@@ -91,7 +91,7 @@ export function ThemeMomentum({ data }: { data: ThemesData }) {
       <GlassCard delay={0.4} noPad>
         {/* Tabs */}
         {hasBottom && (
-          <div className="flex items-center gap-1 px-5 pt-4 pb-2">
+          <div className="flex items-center gap-2 px-5 pt-5 pb-3">
             <button onClick={() => setTab('up')}
               className={`px-4 py-2 text-xs font-semibold rounded-lg transition-all duration-200 ${
                 tab === 'up'

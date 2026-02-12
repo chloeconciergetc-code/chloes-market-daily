@@ -67,13 +67,13 @@ function SectionNav() {
 
   return (
     <nav className="sticky top-0 z-50 backdrop-blur-xl bg-[var(--bg-base)]/80 border-b border-white/[0.04] -mx-4 md:-mx-6 lg:-mx-8 px-4 md:px-6 lg:px-8">
-      <div className="flex items-center gap-1 py-2 overflow-x-auto scrollbar-hide max-w-[1440px] mx-auto">
+      <div className="flex items-center gap-1 py-2.5 overflow-x-auto scrollbar-hide max-w-[1440px] mx-auto">
         {sections.map(s => (
           <button key={s.id}
             onClick={() => document.getElementById(s.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-            className={`px-3 py-1.5 text-xs font-semibold rounded-lg whitespace-nowrap transition-all duration-200 ${
+            className={`px-4 py-2 text-[13px] font-semibold rounded-lg whitespace-nowrap transition-all duration-200 ${
               active === s.id
-                ? 'bg-white/[0.1] text-white'
+                ? 'bg-white/[0.12] text-white shadow-sm'
                 : 'text-white/40 hover:text-white/70 hover:bg-white/[0.04]'
             }`}>
             {s.label}
@@ -114,7 +114,7 @@ export default function App() {
       <SectionNav />
 
       {/* Index Charts */}
-      <div id="section-index" className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-10 scroll-mt-16">
+      <div id="section-index" className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-16 scroll-mt-16">
         {kospi && (
           <GlassCard delay={0.08}>
             <IndexCandlestickChart data={kospi} label="KOSPI" />
@@ -128,16 +128,16 @@ export default function App() {
       </div>
 
       {/* Level 1: Market Pulse */}
-      {summary && <div id="section-pulse" className="mb-10 scroll-mt-16"><MarketPulse data={summary} kospi={kospi ?? undefined} kosdaq={kosdaq ?? undefined} breadth={breadth ?? undefined} /></div>}
+      {summary && <div id="section-pulse" className="mb-16 scroll-mt-16"><MarketPulse data={summary} kospi={kospi ?? undefined} kosdaq={kosdaq ?? undefined} breadth={breadth ?? undefined} /></div>}
 
       {/* Level 2: Direction */}
-      {breadth && <div id="section-breadth" className="mb-10 scroll-mt-16"><BreadthSection data={breadth} /></div>}
-      {themes && <div className="mb-10"><ThemeMomentum data={themes} /></div>}
-      {themes && <div className="mb-10"><SectorHeatmap data={themes.heatmap} /></div>}
+      {breadth && <div id="section-breadth" className="mb-16 scroll-mt-16"><BreadthSection data={breadth} /></div>}
+      {themes && <div className="mb-16"><ThemeMomentum data={themes} /></div>}
+      {themes && <div className="mb-16"><SectorHeatmap data={themes.heatmap} /></div>}
 
       {/* Level 3: Deep Dive */}
-      {newHighs && <div id="section-newhigh" className="mb-10 scroll-mt-16"><NewHighTable data={newHighs} /></div>}
-      {newLows && newLows.length > 0 && <div id="section-newlow" className="mb-10 scroll-mt-16"><NewLowTable data={newLows} /></div>}
+      {newHighs && <div id="section-newhigh" className="mb-16 scroll-mt-16"><NewHighTable data={newHighs} /></div>}
+      {newLows && newLows.length > 0 && <div id="section-newlow" className="mb-16 scroll-mt-16"><NewLowTable data={newLows} /></div>}
 
       <Footer />
     </div>

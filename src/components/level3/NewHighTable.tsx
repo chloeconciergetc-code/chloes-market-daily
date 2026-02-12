@@ -34,12 +34,12 @@ export function NewHighTable({ data }: { data: ScannerStock[] }) {
           ))}
         </div>
 
-        <div className="overflow-x-auto max-h-[420px] overflow-y-auto">
+        <div className="overflow-x-auto max-h-[520px] overflow-y-auto">
           <table className="w-full text-sm">
             <thead className="sticky top-0 z-10">
-              <tr className="text-[11px] font-semibold tracking-wider uppercase text-[var(--text-secondary)] bg-[var(--bg-surface)]">
-                <th className="text-left py-2.5 px-5">종목</th>
-                <th className="text-right py-2.5">종가</th>
+              <tr className="text-[11px] font-semibold tracking-wider uppercase text-[var(--text-secondary)] bg-[var(--bg-surface)] border-b border-white/[0.06]">
+                <th className="text-left py-2.5 px-6">종목</th>
+                <th className="text-right py-2.5 min-w-[100px]">종가</th>
                 <th className="text-right py-2.5">등락률</th>
                 <th className="text-right py-2.5 hidden md:table-cell">시총</th>
                 <th className="text-right py-2.5 pr-5 hidden lg:table-cell">거래량</th>
@@ -52,20 +52,20 @@ export function NewHighTable({ data }: { data: ScannerStock[] }) {
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.02 * Math.min(i, 20) }}
                   className="border-t border-white/[0.03] hover:bg-white/[0.03] transition-colors duration-150 group">
-                  <td className="py-3 px-5">
+                  <td className="py-3.5 px-6">
                     <div className="flex items-center gap-2">
                       <span className="font-medium text-[var(--text-primary)] group-hover:text-white transition-colors">{s.name}</span>
                       <span className="text-[9px] text-[var(--text-muted)] font-mono opacity-0 group-hover:opacity-100 transition-opacity">{s.ticker}</span>
                     </div>
                   </td>
-                  <td className="py-3 text-right font-mono text-sm">{fmtNum(s.close)}원</td>
+                  <td className="py-3.5 text-right font-mono text-sm">{fmtNum(s.close)}원</td>
                   <td className={`py-3 text-right font-mono text-xs font-semibold ${s.changePct >= 0 ? 'text-[var(--color-up)]' : 'text-[var(--color-down)]'}`}>
                     {s.changePct > 0 ? '+' : ''}{s.changePct.toFixed(1)}%
                   </td>
-                  <td className="py-3 text-right text-[var(--text-tertiary)] font-mono text-xs hidden md:table-cell">
+                  <td className="py-3.5 text-right text-[var(--text-tertiary)] font-mono text-xs hidden md:table-cell">
                     {fmtMarketCap(s.marketCap)}
                   </td>
-                  <td className="py-3 text-right text-[var(--text-muted)] font-mono text-xs pr-5 hidden lg:table-cell">
+                  <td className="py-3.5 text-right text-[var(--text-muted)] font-mono text-xs pr-5 hidden lg:table-cell">
                     {fmtVolume(s.volume)}
                   </td>
                 </motion.tr>

@@ -36,9 +36,9 @@ function CustomCell({ x, y, width, height, name, change, onHover, onLeave }: any
 
   const intensity = Math.min(1, Math.abs(change) / 4)
   const color = change > 0
-    ? `rgba(0, 230, 118, ${0.12 + intensity * 0.55})`
+    ? `rgba(0, 230, 118, ${0.7 + intensity * 0.15})`
     : change < 0
-    ? `rgba(255, 23, 68, ${0.12 + intensity * 0.55})`
+    ? `rgba(255, 23, 68, ${0.7 + intensity * 0.15})`
     : 'rgba(255,255,255,0.04)'
 
   const textColor = change > 0
@@ -57,20 +57,20 @@ function CustomCell({ x, y, width, height, name, change, onHover, onLeave }: any
       onMouseLeave={() => onLeave?.()}
       style={{ cursor: 'pointer' }}
     >
-      <rect x={x + 1.5} y={y + 1.5} width={width - 3} height={height - 3} rx={5}
+      <rect x={x + 2} y={y + 2} width={width - 4} height={height - 4} rx={5}
         fill={color} stroke="rgba(6,6,11,0.9)" strokeWidth={1.5} />
       {showText && (
         <text x={x + width / 2} y={y + height / 2 - (showChange ? 6 : 0)}
           textAnchor="middle" dominantBaseline="middle"
           fill="rgba(255,255,255,0.9)" fontSize={width > 90 ? 11 : 10} fontWeight={600}
-          fontFamily="var(--font-sans)">
+          fontFamily="var(--font-sans)" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>
           {name?.length > (width > 90 ? 14 : 8) ? name.slice(0, width > 90 ? 13 : 7) + '…' : name}
         </text>
       )}
       {showChange && (
         <text x={x + width / 2} y={y + height / 2 + 10}
           textAnchor="middle" dominantBaseline="middle"
-          fill={textColor} fontSize={9} fontFamily="var(--font-mono)" fontWeight={500}>
+          fill={textColor} fontSize={9} fontFamily="var(--font-mono)" fontWeight={600} style={{ textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>
           {change > 0 ? '+' : ''}{change?.toFixed(1)}%
         </text>
       )}

@@ -9,13 +9,13 @@ function MetricCard({ title, value, unit, sub, signal, sparkData, sparkColor, de
   sparkData?: number[]; sparkColor?: string; delay?: number
 }) {
   return (
-    <GlassCard delay={delay} className="flex flex-col justify-between min-h-[120px]">
+    <GlassCard delay={delay} className="flex flex-col justify-between min-h-[140px]">
       <div className="flex items-center justify-between mb-3">
         <span className="text-xs font-semibold tracking-wider uppercase text-[var(--text-secondary)]">{title}</span>
         {signal && <SignalLight signal={signal} size="sm" />}
       </div>
       <div className="flex items-baseline gap-1.5">
-        <span className="font-mono text-[28px] font-bold leading-none tracking-tight">{value}</span>
+        <span className="font-mono text-[32px] font-bold leading-none tracking-tight">{value}</span>
         {unit && <span className="text-xs text-[var(--text-tertiary)] font-medium">{unit}</span>}
       </div>
       {sub && <div className="text-[var(--text-secondary)] text-sm mt-1.5 leading-relaxed">{sub}</div>}
@@ -40,9 +40,9 @@ function IndexCard({ label, data, delay = 0 }: { label: string; data: IndexChart
   const arrow = isUp ? '▲' : '▼'
 
   return (
-    <GlassCard delay={delay} className="flex flex-col justify-between min-h-[120px]">
+    <GlassCard delay={delay} className="flex flex-col justify-between min-h-[140px]">
       <span className="text-xs font-semibold tracking-wider uppercase text-[var(--text-secondary)] mb-2">{label}</span>
-      <div className="font-mono text-[32px] font-bold leading-none tracking-tight" style={{ color }}>
+      <div className="font-mono text-[36px] font-bold leading-none tracking-tight" style={{ color }}>
         {last.c.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
       </div>
       <div className="flex items-center gap-2 mt-2 text-[16px] font-mono font-semibold" style={{ color }}>
@@ -65,7 +65,7 @@ export function MarketPulse({ data, kospi, kosdaq, breadth }: { data: MarketSumm
   return (
     <div>
       <SectionHeader icon="🌡️" title="시장 체온계" subtitle="Market Pulse" delay={0.08} />
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
         <MetricCard
           title="상승 종목" value={latest.up.toLocaleString()} unit="종목" delay={0.1}
           sparkColor="var(--color-up)"
@@ -100,7 +100,7 @@ export function MarketPulse({ data, kospi, kosdaq, breadth }: { data: MarketSumm
 
       {/* Index Cards */}
       {(kospi || kosdaq) && (
-        <div className="grid grid-cols-2 gap-3 mt-4">
+        <div className="grid grid-cols-2 gap-4 mt-4">
           {kospi && <IndexCard label="KOSPI" data={kospi} delay={0.3} />}
           {kosdaq && <IndexCard label="KOSDAQ" data={kosdaq} delay={0.34} />}
         </div>
