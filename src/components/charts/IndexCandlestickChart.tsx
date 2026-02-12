@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { scaleLinear } from 'd3-scale'
 import { motion } from 'framer-motion'
 import type { IndexChartData } from '../../types/market'
@@ -11,6 +12,7 @@ interface Props {
 
 export function IndexCandlestickChart({ data, label, width = 600, height = 320 }: Props) {
   const { candles, ma20, ma60 } = data
+  const [showMA, setShowMA] = useState(true)
   if (!candles.length) return null
 
   const chartH = height * 0.7
@@ -52,6 +54,12 @@ export function IndexCandlestickChart({ data, label, width = 600, height = 320 }
           ${isUp ? 'bg-[var(--color-up-soft)] text-[var(--color-up)]' : 'bg-[var(--color-down-soft)] text-[var(--color-down)]'}`}>
           {isUp ? '↑' : '↓'} {Math.abs(dayChange).toLocaleString()} ({dayChangePct > 0 ? '+' : ''}{dayChangePct.toFixed(2)}%)
         </span>
+        <button onClick={() => setShowMA(v => !v)}
+          className={`ml-auto px-2.5 py-1 text-[10px] font-semibold tracking-wide uppercase rounded-lg transition-all duration-200 ${
+            showMA ? 'bg-white/[0.08] text-white' : 'text-white/40 hover:text-white/60 hover:bg-white/[0.03]'
+          }`}>
+          MA
+        </button>
       </div>
 
       <svg viewBox={`0 0 ${width} ${height}`} className="w-full" preserveAspectRatio="xMidYMid meet">
@@ -71,8 +79,10 @@ export function IndexCandlestickChart({ data, label, width = 600, height = 320 }
         })}
 
         {/* MA lines */}
-        <path d={makePath(ma20)} fill="none" stroke="var(--color-ma20)" strokeWidth={1.2} opacity={0.6} strokeLinecap="round" />
-        <path d={makePath(ma60)} fill="none" stroke="var(--color-ma60)" strokeWidth={1.2} opacity={0.6} strokeLinecap="round" />
+        {showMA && <>
+          <path d={makePath(ma20)} fill="none" stroke="#3b82f6" strokeWidth={1.5} opacity={0.7} strokeLinecap="round" />
+          <path d={makePath(ma60)} fill="none" stroke="#f97316" strokeWidth={1.5} opacity={0.7} strokeLinecap="round" />
+        </>}
 
         {/* Candles */}
         {candles.map((c, i) => {
@@ -124,13 +134,15 @@ export function IndexCandlestickChart({ data, label, width = 600, height = 320 }
         </g>
 
         {/* MA Legend */}
-        <g transform={`translate(${margin.left + 2}, ${margin.top - 6})`}>
-          <rect x={-2} y={-6} width={100} height={14} rx={4} fill="rgba(0,0,0,0.3)" />
-          <line x1={2} x2={14} y1={0} y2={0} stroke="var(--color-ma20)" strokeWidth={1.5} strokeLinecap="round" />
-          <text x={18} y={3} fill="var(--text-tertiary)" fontSize={8} fontFamily="var(--font-mono)">MA20</text>
-          <line x1={50} x2={62} y1={0} y2={0} stroke="var(--color-ma60)" strokeWidth={1.5} strokeLinecap="round" />
-          <text x={66} y={3} fill="var(--text-tertiary)" fontSize={8} fontFamily="var(--font-mono)">MA60</text>
-        </g>
+        {showMA && (
+          <g transform={`translate(${margin.left + 2}, ${margin.top - 6})`}>
+            <rect x={-2} y={-6} width={100} height={14} rx={4} fill="rgba(0,0,0,0.3)" />
+            <line x1={2} x2={14} y1={0} y2={0} stroke="#3b82f6" strokeWidth={1.5} strokeLinecap="round" />
+            <text x={18} y={3} fill="var(--text-tertiary)" fontSize={8} fontFamily="var(--font-mono)">MA20</text>
+            <line x1={50} x2={62} y1={0} y2={0} stroke="#f97316" strokeWidth={1.5} strokeLinecap="round" />
+            <text x={66} y={3} fill="var(--text-tertiary)" fontSize={8} fontFamily="var(--font-mono)">MA60</text>
+          </g>
+        )}
       </svg>
     </div>
   )

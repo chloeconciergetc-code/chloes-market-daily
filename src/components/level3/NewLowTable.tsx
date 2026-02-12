@@ -28,7 +28,7 @@ export function NewLowTable({ data }: { data: ScannerStock[] }) {
                   ? 'bg-white/[0.08] text-white shadow-[0_0_12px_rgba(255,255,255,0.05)]'
                   : 'text-white/55 hover:text-[var(--text-secondary)] hover:bg-white/[0.03]'
               }`}>
-              {sortLabels[key]}
+              {sortLabels[key]}{sortBy === key ? ' ▼' : ''}
             </button>
           ))}
         </div>
@@ -52,8 +52,9 @@ export function NewLowTable({ data }: { data: ScannerStock[] }) {
                   transition={{ delay: 0.02 * Math.min(i, 20) }}
                   className="border-t border-white/[0.03] hover:bg-white/[0.03] transition-colors duration-150 group">
                   <td className="py-3.5 px-6">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-medium text-[var(--text-primary)] group-hover:text-white transition-colors">{s.name}</span>
+                      {s.sector && <span className="bg-white/[0.05] text-[var(--text-secondary)] text-xs rounded-full px-2 py-0.5">{s.sector}</span>}
                       <span className="text-[9px] text-[var(--text-muted)] font-mono opacity-0 group-hover:opacity-100 transition-opacity">{s.ticker}</span>
                     </div>
                   </td>

@@ -8,11 +8,26 @@ function MetricCard({ title, value, unit, sub, signal, sparkData, sparkColor, de
   title: string; value: string; unit?: string; sub?: string; signal?: 'green' | 'yellow' | 'red'
   sparkData?: number[]; sparkColor?: string; delay?: number
 }) {
+  // Compute delta from last two sparkline values
+  const delta = sparkData && sparkData.length >= 2
+    ? sparkData[sparkData.length - 1] - sparkData[sparkData.length - 2]
+    : null
+  const hasDelta = delta !== null && !isNaN(delta) && delta !== 0
+
   return (
     <GlassCard delay={delay} className="flex flex-col justify-between min-h-[140px]">
       <div className="flex items-center justify-between mb-3">
         <span className="text-xs font-semibold tracking-wider uppercase text-[var(--text-secondary)]">{title}</span>
-        {signal && <SignalLight signal={signal} size="sm" />}
+        <div className="flex items-center gap-2">
+          {hasDelta && (
+            <span className={`text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded ${
+              delta! > 0 ? 'text-[var(--color-up)] bg-[var(--color-up-soft)]' : 'text-[var(--color-down)] bg-[var(--color-down-soft)]'
+            }`}>
+              {delta! > 0 ? '▲' : '▼'}{Math.abs(delta!).toLocaleString(undefined, { maximumFractionDigits: 1 })}
+            </span>
+          )}
+          {signal && <SignalLight signal={signal} size="sm" />}
+        </div>
       </div>
       <div className="flex items-baseline gap-1.5">
         <span className="font-mono text-[32px] font-bold leading-none tracking-tight">{value}</span>

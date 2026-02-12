@@ -135,8 +135,7 @@ def extract_market_summary(cur, latest, trade_dates):
             SELECT 
                 COUNT(*) FILTER (WHERE b.close > prev.close) as up,
                 COUNT(*) FILTER (WHERE b.close < prev.close) as down,
-                COUNT(*) FILTER (WHERE b.close = prev.close) as flat,
-                SUM(b.close * b.volume) / 1e12 as trading_value
+                COUNT(*) FILTER (WHERE b.close = prev.close) as flat
             FROM market.daily_bars b
             JOIN LATERAL (
                 SELECT close FROM market.daily_bars p 
@@ -146,9 +145,16 @@ def extract_market_summary(cur, latest, trade_dates):
             WHERE b.trade_date = %s AND b.volume > 0 AND b.volume IS NOT NULL
         """, (td, td))
         row = cur.fetchone()
+        # Compute trading value separately (no LATERAL needed)
+        cur.execute("""
+            SELECT COALESCE(SUM(close * volume) / 1e12, 0)
+            FROM market.daily_bars
+            WHERE trade_date = %s AND volume > 0 AND close > 0
+        """, (td,))
+        tv_row = cur.fetchone()
         if row:
             up, down, flat = int(row[0] or 0), int(row[1] or 0), int(row[2] or 0)
-            tv = round(float(row[3] or 0), 1)
+            tv = round(float(tv_row[0] if tv_row and tv_row[0] else 0), 1)
             adr = round(up / max(down, 1), 2)
             summary_spark.append({
                 'date': td.isoformat(),
