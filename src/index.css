@@ -1,44 +1,47 @@
 @import "tailwindcss";
 
 :root {
-  --neon-green: #34d399;
-  --neon-red: #f87171;
-  --glass-bg: rgba(255, 255, 255, 0.05);
-  --glass-border: rgba(255, 255, 255, 0.1);
+  --bg-primary: #0a0a0f;
+  --bg-card: rgba(255, 255, 255, 0.04);
+  --bg-card-hover: rgba(255, 255, 255, 0.08);
+  --border-card: rgba(255, 255, 255, 0.08);
+  --text-primary: #e8e8e8;
+  --text-secondary: #888;
+  --color-up: #00e676;
+  --color-down: #ff1744;
+  --color-flat: #888;
+  --color-ma20: #42a5f5;
+  --color-ma60: #ab47bc;
+  --color-accent: #7c4dff;
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', system-ui, sans-serif;
-  background: #0a0a0f;
-  color: #f5f5f7;
+  font-family: 'Pretendard Variable', Pretendard, -apple-system, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
 }
 
-.glass {
-  background: var(--glass-bg);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--glass-border);
-  border-radius: 20px;
+.font-mono { font-family: 'JetBrains Mono', monospace; }
+
+.glass-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: 16px;
+  backdrop-filter: blur(12px);
+  transition: background 0.2s;
 }
+.glass-card:hover { background: var(--bg-card-hover); }
 
-.neon-green { color: var(--neon-green); }
-.neon-red { color: var(--neon-red); }
+.text-up { color: var(--color-up); }
+.text-down { color: var(--color-down); }
+.text-flat { color: var(--color-flat); }
 
-.gradient-bg {
-  background: radial-gradient(ellipse at 20% 0%, rgba(52, 211, 153, 0.08) 0%, transparent 50%),
-              radial-gradient(ellipse at 80% 100%, rgba(248, 113, 113, 0.06) 0%, transparent 50%),
-              #0a0a0f;
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
 }
-
-/* Scrollbar */
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+.animate-in { animation: fadeInUp 0.5s ease-out both; }

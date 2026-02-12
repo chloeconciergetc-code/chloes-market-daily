@@ -1,0 +1,49 @@
+@import "tailwindcss";
+
+:root {
+  --bg-base: #0a0a0f;
+  --bg-card: rgba(255, 255, 255, 0.04);
+  --bg-card-hover: rgba(255, 255, 255, 0.08);
+  --bg-elevated: rgba(255, 255, 255, 0.06);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-blur: 16px;
+
+  --text-primary: rgba(255, 255, 255, 0.92);
+  --text-secondary: rgba(255, 255, 255, 0.55);
+  --text-tertiary: rgba(255, 255, 255, 0.30);
+
+  --color-up: #00e676;
+  --color-up-dim: rgba(0, 230, 118, 0.15);
+  --color-down: #ff1744;
+  --color-down-dim: rgba(255, 23, 68, 0.15);
+  --color-flat: rgba(255, 255, 255, 0.30);
+
+  --signal-green: #00e676;
+  --signal-yellow: #ffab00;
+  --signal-red: #ff1744;
+
+  --color-ma20: #42a5f5;
+  --color-ma60: #ab47bc;
+
+  --font-sans: 'Pretendard Variable', 'Pretendard', -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', monospace;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--bg-base);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
