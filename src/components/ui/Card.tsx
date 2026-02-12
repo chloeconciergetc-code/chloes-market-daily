@@ -1,22 +1,43 @@
 import type { ReactNode } from 'react'
 
-export function Card({ children, className = '', noPad = false }: {
+type CardTier = 'ambient' | 'standard' | 'elevated'
+
+const tierStyles: Record<CardTier, string> = {
+  ambient: `
+    bg-transparent
+    border border-[var(--border-default)]
+    rounded-[var(--radius-md)]
+  `,
+  standard: `
+    bg-[var(--bg-card)]
+    border border-[var(--border-default)]
+    hover:border-[var(--border-hover)]
+    rounded-[var(--radius-lg)]
+    shadow-[var(--shadow-card)]
+  `,
+  elevated: `
+    bg-[var(--bg-card)]
+    border border-[var(--border-hover)]
+    rounded-[var(--radius-lg)]
+    shadow-[var(--shadow-elevated)]
+  `,
+}
+
+export function Card({ children, className = '', noPad = false, tier = 'standard' }: {
   children: ReactNode
   className?: string
   noPad?: boolean
+  tier?: CardTier
 }) {
   return (
     <div
       className={`
         relative overflow-hidden
-        rounded-[var(--radius-lg)]
-        ${noPad ? '' : 'p-5 md:p-6'}
-        bg-[var(--bg-card)]
-        border border-[var(--border-default)]
-        hover:border-[var(--border-hover)]
-        transition-colors duration-200
+        transition-all duration-[var(--duration-normal)]
+        ${tierStyles[tier]}
+        ${noPad ? '' : 'p-5'}
         ${className}
-      `}
+      `.trim()}
     >
       {children}
     </div>

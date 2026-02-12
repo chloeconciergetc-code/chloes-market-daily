@@ -15,17 +15,17 @@ import type { IndexChartData, MarketSummary, BreadthDay, ThemesData, ScannerStoc
 
 function Header({ date }: { date?: string }) {
   return (
-    <header className="text-center mb-6 pt-4">
+    <header className="text-center mb-4 pt-4">
       <h1 className="font-bold tracking-tight text-[var(--text-primary)]" style={{ fontSize: 'var(--text-display)' }}>
         Chloe's Market Daily
       </h1>
       {date && (
-        <p className="text-[var(--text-secondary)] font-mono mt-1.5" style={{ fontSize: 'var(--text-caption)' }}>
+        <p className="text-[var(--text-secondary)] font-mono mt-1" style={{ fontSize: 'var(--text-caption)' }}>
           {date} · 15:30 장마감 기준
         </p>
       )}
       {!date && (
-        <p className="text-[var(--text-tertiary)] font-mono mt-1.5" style={{ fontSize: 'var(--text-caption)' }}>
+        <p className="text-[var(--text-muted)] font-mono mt-1" style={{ fontSize: 'var(--text-caption)' }}>
           데이터 로딩 중...
         </p>
       )}
@@ -34,14 +34,13 @@ function Header({ date }: { date?: string }) {
 }
 
 const sections = [
-  { id: 'section-regime', label: '시장체온' },
-  { id: 'section-index', label: '지수' },
-  { id: 'section-pulse', label: '펄스' },
+  { id: 'section-regime', label: '시장종합' },
+  { id: 'section-pulse', label: '체온계' },
+  { id: 'section-index', label: '차트' },
   { id: 'section-investor', label: '수급' },
   { id: 'section-breadth', label: '시장폭' },
   { id: 'section-themes', label: '테마' },
-  { id: 'section-newhigh', label: '신고가' },
-  { id: 'section-newlow', label: '신저가' },
+  { id: 'section-scanner', label: '스캐너' },
 ]
 
 function SectionNav() {
@@ -63,17 +62,17 @@ function SectionNav() {
   }, [])
 
   return (
-    <nav className="sticky top-0 z-50 bg-[var(--bg-base)]/95 backdrop-blur-sm border-b border-[var(--border-default)] -mx-4 md:-mx-6 lg:-mx-8 px-4 md:px-6 lg:px-8">
-      <div className="flex items-center gap-1 py-2.5 overflow-x-auto scrollbar-hide max-w-[1400px] mx-auto">
+    <nav className="sticky top-0 z-50 bg-[var(--bg-base)]/95 backdrop-blur-md border-b border-[var(--border-default)] -mx-4 md:-mx-6 lg:-mx-8 px-4 md:px-6 lg:px-8">
+      <div className="flex items-center gap-0.5 py-2 overflow-x-auto scrollbar-hide max-w-[1200px] mx-auto">
         {sections.map(s => (
           <button key={s.id}
             onClick={() => document.getElementById(s.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-            className={`px-4 py-2 font-semibold rounded-[var(--radius-md)] whitespace-nowrap transition-all duration-200 ${
+            className={`px-3 py-1.5 font-semibold rounded-[var(--radius-sm)] whitespace-nowrap transition-all duration-200 ${
               active === s.id
-                ? 'bg-[var(--bg-elevated)] text-[var(--text-primary)]'
+                ? 'bg-[var(--color-accent-soft)] text-[var(--color-accent)]'
                 : 'text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-subtle)]'
             }`}
-            style={{ fontSize: 'var(--text-body)' }}>
+            style={{ fontSize: 'var(--text-caption)' }}>
             {s.label}
           </button>
         ))}
@@ -84,9 +83,9 @@ function SectionNav() {
 
 function Footer() {
   return (
-    <footer className="text-center py-10 mt-6">
-      <div className="h-px w-24 mx-auto bg-[var(--border-default)] mb-6" />
-      <span className="text-[var(--text-muted)]" style={{ fontSize: 'var(--text-caption)' }}>Powered by Chloe 🫧</span>
+    <footer className="text-center py-8 mt-4">
+      <div className="h-px w-16 mx-auto bg-[var(--border-default)] mb-4" />
+      <span className="text-[var(--text-muted)]" style={{ fontSize: 'var(--text-micro)' }}>Powered by Chloe 🫧</span>
     </footer>
   )
 }
@@ -104,16 +103,27 @@ export default function App() {
   const regime = useData<MarketRegimeData>('market-regime.json')
 
   return (
-    <div className="min-h-screen px-4 py-6 md:px-6 lg:px-8 max-w-[1400px] mx-auto">
+    <div className="min-h-screen px-4 py-4 md:px-6 lg:px-8 max-w-[1200px] mx-auto">
       <Header date={meta?.dataDate} />
       <SectionNav />
 
-      {/* Level 1: Market Regime - TOP PRIORITY */}
-      {regime && <div id="section-regime" className="mb-8 scroll-mt-16"><MarketRegime data={regime} /></div>}
+      {/* Hero: Market Regime */}
+      {regime && (
+        <div id="section-regime" className="mb-6 scroll-mt-14 animate-fade-in">
+          <MarketRegime data={regime} />
+        </div>
+      )}
+
+      {/* Level 1: Market Pulse + Index Summary */}
+      {summary && (
+        <div id="section-pulse" className="mb-6 scroll-mt-14">
+          <MarketPulse data={summary} kospi={kospi ?? undefined} kosdaq={kosdaq ?? undefined} breadth={breadth ?? undefined} />
+        </div>
+      )}
 
       {/* Index Charts */}
-      <div id="section-index" className="scroll-mt-16 mb-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div id="section-index" className="scroll-mt-14 mb-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
           {kospi && (
             <Card>
               <IndexCandlestickChart data={kospi} label="KOSPI" />
@@ -125,9 +135,8 @@ export default function App() {
             </Card>
           )}
         </div>
-        {/* KOSPI vs KOSDAQ Overlay */}
         {kospi && kosdaq && (
-          <div className="mt-4">
+          <div className="mt-3">
             <Card>
               <IndexOverlayChart kospi={kospi} kosdaq={kosdaq} />
             </Card>
@@ -135,22 +144,23 @@ export default function App() {
         )}
       </div>
 
-      {/* Level 1: Market Pulse */}
-      {summary && <div id="section-pulse" className="mb-8 scroll-mt-16"><MarketPulse data={summary} kospi={kospi ?? undefined} kosdaq={kosdaq ?? undefined} breadth={breadth ?? undefined} /></div>}
-
       {/* Level 2: Investor Flow */}
-      {investorFlow && <div id="section-investor" className="mb-8 scroll-mt-16"><InvestorFlow data={investorFlow} /></div>}
+      {investorFlow && <div id="section-investor" className="mb-6 scroll-mt-14"><InvestorFlow data={investorFlow} /></div>}
 
       {/* Level 2: Breadth */}
-      {breadth && <div id="section-breadth" className="mb-8 scroll-mt-16"><BreadthSection data={breadth} /></div>}
+      {breadth && <div id="section-breadth" className="mb-6 scroll-mt-14"><BreadthSection data={breadth} /></div>}
 
-      {/* Level 2: Themes */}
-      {themes && <div id="section-themes" className="mb-8 scroll-mt-16"><ThemeMomentum data={themes} /></div>}
-      {themes && <div className="mb-8"><SectorHeatmap data={themes.heatmap} /></div>}
+      {/* Level 2: Themes + Heatmap */}
+      <div id="section-themes" className="mb-6 scroll-mt-14">
+        {themes && <ThemeMomentum data={themes} />}
+        {themes && <div className="mt-3"><SectorHeatmap data={themes.heatmap} /></div>}
+      </div>
 
-      {/* Level 3: Deep Dive */}
-      {newHighs && <div id="section-newhigh" className="mb-8 scroll-mt-16"><NewHighTable data={newHighs} /></div>}
-      {newLows && newLows.length > 0 && <div id="section-newlow" className="mb-8 scroll-mt-16"><NewLowTable data={newLows} /></div>}
+      {/* Level 3: Scanner (consolidated) */}
+      <div id="section-scanner" className="mb-6 scroll-mt-14">
+        {newHighs && <NewHighTable data={newHighs} />}
+        {newLows && newLows.length > 0 && <div className="mt-3"><NewLowTable data={newLows} /></div>}
+      </div>
 
       <Footer />
     </div>

@@ -14,12 +14,12 @@ function MetricCard({ title, value, unit, sub, signal, sparkData, sparkColor }: 
   const hasDelta = delta !== null && !isNaN(delta) && delta !== 0
 
   return (
-    <Card className="flex flex-col justify-between min-h-[130px]">
-      <div className="flex items-center justify-between mb-3">
-        <span className="font-semibold tracking-wide uppercase text-[var(--text-secondary)]" style={{ fontSize: 'var(--text-label)' }}>{title}</span>
+    <Card className="flex flex-col justify-between min-h-[120px]">
+      <div className="flex items-center justify-between mb-2">
+        <span className="font-semibold tracking-wide uppercase text-[var(--text-tertiary)]" style={{ fontSize: 'var(--text-caption)' }}>{title}</span>
         <div className="flex items-center gap-2">
           {hasDelta && (
-            <span className={`font-mono font-semibold px-1.5 py-0.5 rounded ${
+            <span className={`font-mono font-semibold px-1.5 py-0.5 rounded-[var(--radius-xs)] ${
               delta! > 0 ? 'text-[var(--color-up)] bg-[var(--color-up-soft)]' : 'text-[var(--color-down)] bg-[var(--color-down-soft)]'
             }`} style={{ fontSize: 'var(--text-micro)' }}>
               {delta! > 0 ? '▲' : '▼'}{Math.abs(delta!).toLocaleString(undefined, { maximumFractionDigits: 1 })}
@@ -28,14 +28,14 @@ function MetricCard({ title, value, unit, sub, signal, sparkData, sparkColor }: 
           {signal && <SignalLight signal={signal} size="sm" />}
         </div>
       </div>
-      <div className="flex items-baseline gap-1.5">
-        <span className="font-mono font-bold leading-none tracking-tight" style={{ fontSize: '1.75rem' }}>{value}</span>
-        {unit && <span className="text-[var(--text-tertiary)] font-medium" style={{ fontSize: 'var(--text-label)' }}>{unit}</span>}
+      <div className="flex items-baseline gap-1">
+        <span className="font-mono font-bold leading-none tracking-tight animate-count-up" style={{ fontSize: 'var(--text-display)' }}>{value}</span>
+        {unit && <span className="text-[var(--text-tertiary)] font-medium" style={{ fontSize: 'var(--text-caption)' }}>{unit}</span>}
       </div>
-      {sub && <div className="text-[var(--text-secondary)] mt-1.5 leading-relaxed" style={{ fontSize: 'var(--text-body)' }}>{sub}</div>}
+      {sub && <div className="text-[var(--text-secondary)] mt-1 leading-relaxed" style={{ fontSize: 'var(--text-caption)' }}>{sub}</div>}
       {sparkData && sparkData.length > 0 && (
-        <div className="mt-auto pt-3">
-          <Sparkline data={sparkData} color={sparkColor} width={120} height={24} />
+        <div className="mt-auto pt-2">
+          <Sparkline data={sparkData} color={sparkColor} width={120} height={22} />
         </div>
       )}
     </Card>
@@ -54,17 +54,17 @@ function IndexCard({ label, data }: { label: string; data: IndexChartData }) {
   const arrow = isUp ? '▲' : '▼'
 
   return (
-    <Card className="flex flex-col justify-between min-h-[130px]">
-      <span className="font-semibold tracking-wide uppercase text-[var(--text-secondary)] mb-2" style={{ fontSize: 'var(--text-label)' }}>{label}</span>
-      <div className="font-mono font-bold leading-none tracking-tight" style={{ fontSize: '2rem', color }}>
+    <Card className="flex flex-col justify-between min-h-[120px]">
+      <span className="font-semibold tracking-wide uppercase text-[var(--text-tertiary)] mb-1" style={{ fontSize: 'var(--text-caption)' }}>{label}</span>
+      <div className="font-mono font-bold leading-none tracking-tight animate-count-up" style={{ fontSize: 'var(--text-display)', color }}>
         {last.c.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
       </div>
-      <div className="flex items-center gap-2 mt-2 font-mono font-semibold" style={{ color, fontSize: 'var(--text-body)' }}>
+      <div className="flex items-center gap-2 mt-1.5 font-mono font-semibold" style={{ color, fontSize: 'var(--text-caption)' }}>
         <span>{arrow} {Math.abs(change).toFixed(2)}</span>
         <span>({changeRate >= 0 ? '+' : ''}{changeRate.toFixed(2)}%)</span>
       </div>
-      <div className="text-[var(--text-secondary)] mt-1.5" style={{ fontSize: 'var(--text-body)' }}>
-        거래량 {last.v.toLocaleString()}
+      <div className="text-[var(--text-tertiary)] mt-1" style={{ fontSize: 'var(--text-caption)' }}>
+        거래량 <span className="font-mono">{last.v.toLocaleString()}</span>
       </div>
     </Card>
   )
@@ -79,7 +79,16 @@ export function MarketPulse({ data, kospi, kosdaq, breadth }: { data: MarketSumm
   return (
     <div>
       <SectionHeader title="시장 체온계" subtitle="Market Pulse" />
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+
+      {/* Index cards first */}
+      {(kospi || kosdaq) && (
+        <div className="grid grid-cols-2 gap-3 mb-3 stagger">
+          {kospi && <IndexCard label="KOSPI" data={kospi} />}
+          {kosdaq && <IndexCard label="KOSDAQ" data={kosdaq} />}
+        </div>
+      )}
+
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 stagger">
         <MetricCard title="상승 종목" value={latest.up.toLocaleString()} unit="종목" sparkColor="var(--color-up)" />
         <MetricCard title="하락 종목" value={latest.down.toLocaleString()} unit="종목" sparkColor="var(--color-down)" />
         <MetricCard
@@ -102,13 +111,6 @@ export function MarketPulse({ data, kospi, kosdaq, breadth }: { data: MarketSumm
           ) : undefined}
         />
       </div>
-
-      {(kospi || kosdaq) && (
-        <div className="grid grid-cols-2 gap-4 mt-4">
-          {kospi && <IndexCard label="KOSPI" data={kospi} />}
-          {kosdaq && <IndexCard label="KOSDAQ" data={kosdaq} />}
-        </div>
-      )}
     </div>
   )
 }
