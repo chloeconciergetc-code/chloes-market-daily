@@ -15,17 +15,18 @@ function Header({ date }: { date?: string }) {
       initial={{ opacity: 0, y: -24 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-      className="text-center mb-10 pt-4"
+      className="text-center mb-8 pt-4"
     >
-      <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--color-up-soft)] border border-[var(--color-up)]/10 mb-4">
-        <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-up)] animate-pulse" />
-        <span className="text-[10px] font-semibold tracking-widest uppercase text-[var(--color-up)]">MARKET REPORT</span>
+      <div className="flex items-center justify-center gap-3 mb-1">
+        <div className="h-[1px] w-8 bg-gradient-to-r from-transparent to-white/10" />
+        <span className="text-[9px] font-semibold tracking-[0.2em] uppercase text-[var(--text-tertiary)]">MARKET REPORT</span>
+        <div className="h-[1px] w-8 bg-gradient-to-l from-transparent to-white/10" />
       </div>
-      <h1 className="text-3xl md:text-[40px] font-bold tracking-tight leading-tight bg-gradient-to-b from-white to-white/60 bg-clip-text text-transparent">
+      <h1 className="text-2xl md:text-[32px] font-bold tracking-tight leading-tight text-white/90">
         Chloe's Market Daily
       </h1>
       {date && (
-        <p className="text-[var(--text-tertiary)] text-sm mt-2 font-mono">{date}</p>
+        <p className="text-[var(--text-muted)] text-xs mt-1.5 font-mono tracking-wide">{date}</p>
       )}
     </motion.header>
   )
@@ -59,7 +60,7 @@ export default function App() {
       <Header date={meta?.dataDate} />
 
       {/* Index Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-10">
         {kospi && (
           <GlassCard delay={0.08}>
             <IndexCandlestickChart data={kospi} label="KOSPI" />
@@ -73,15 +74,15 @@ export default function App() {
       </div>
 
       {/* Level 1: Market Pulse */}
-      {summary && <div className="mb-8"><MarketPulse data={summary} /></div>}
+      {summary && <div className="mb-10"><MarketPulse data={summary} /></div>}
 
       {/* Level 2: Direction */}
-      {breadth && <div className="mb-8"><BreadthSection data={breadth} /></div>}
-      {themes && <div className="mb-8"><ThemeMomentum data={themes} /></div>}
-      {themes && <div className="mb-8"><SectorHeatmap data={themes.heatmap} /></div>}
+      {breadth && <div className="mb-10"><BreadthSection data={breadth} /></div>}
+      {themes && <div className="mb-10"><ThemeMomentum data={themes} /></div>}
+      {themes && <div className="mb-10"><SectorHeatmap data={themes.heatmap} /></div>}
 
       {/* Level 3: Deep Dive */}
-      {newHighs && <div className="mb-8"><NewHighTable data={newHighs} /></div>}
+      {newHighs && <div className="mb-10"><NewHighTable data={newHighs} /></div>}
 
       <Footer />
     </div>

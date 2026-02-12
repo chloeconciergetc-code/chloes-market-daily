@@ -29,8 +29,8 @@ function CustomCell({ x, y, width, height, name, change }: any) {
 
   return (
     <g>
-      <rect x={x + 1} y={y + 1} width={width - 2} height={height - 2} rx={6}
-        fill={color} stroke="rgba(6,6,11,0.8)" strokeWidth={1.5} />
+      <rect x={x + 1.5} y={y + 1.5} width={width - 3} height={height - 3} rx={5}
+        fill={color} stroke="rgba(6,6,11,0.9)" strokeWidth={1.5} />
       {showText && (
         <text x={x + width / 2} y={y + height / 2 - (showChange ? 6 : 0)}
           textAnchor="middle" dominantBaseline="middle"
@@ -57,7 +57,7 @@ export function SectorHeatmap({ data }: { data: HeatmapItem[] }) {
     <div>
       <SectionHeader icon="🗺️" title="테마 히트맵" subtitle="Heatmap" delay={0.42} />
       <GlassCard delay={0.45}>
-        <div className="w-full" style={{ height: 300 }}>
+        <div className="w-full" style={{ height: 360 }}>
           <ResponsiveContainer width="100%" height="100%">
             <Treemap
               data={treeData}

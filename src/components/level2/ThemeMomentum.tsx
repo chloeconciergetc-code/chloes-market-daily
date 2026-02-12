@@ -5,9 +5,9 @@ import type { ThemesData } from '../../types/market'
 function BarFill({ value, max, color }: { value: number; max: number; color: string }) {
   const pct = Math.min(100, (Math.abs(value) / max) * 100)
   return (
-    <div className="relative w-16 h-1.5 rounded-full bg-white/[0.04] overflow-hidden">
-      <div className="absolute inset-y-0 left-0 rounded-full transition-all duration-500"
-        style={{ width: `${pct}%`, background: color }} />
+    <div className="relative w-20 h-[5px] rounded-full bg-white/[0.04] overflow-hidden">
+      <div className="absolute inset-y-0 left-0 rounded-full transition-all duration-700 ease-out"
+        style={{ width: `${pct}%`, background: `linear-gradient(90deg, ${color}88, ${color})` }} />
     </div>
   )
 }
@@ -23,13 +23,13 @@ export function ThemeMomentum({ data }: { data: ThemesData }) {
           <table className="w-full text-sm">
             <thead>
               <tr className="text-[10px] font-semibold tracking-wider uppercase text-[var(--text-tertiary)]">
-                <th className="text-left py-3 px-5 w-8">#</th>
-                <th className="text-left py-3">테마</th>
-                <th className="text-right py-3 pr-3">등락률</th>
-                <th className="text-center py-3 w-20 hidden sm:table-cell"></th>
-                <th className="text-right py-3">동조율</th>
-                <th className="text-right py-3 hidden md:table-cell">종목수</th>
-                <th className="text-left py-3 pl-5 hidden lg:table-cell">대장주</th>
+                <th className="text-left py-3.5 px-5 w-8">#</th>
+                <th className="text-left py-3.5">테마</th>
+                <th className="text-right py-3.5 pr-3">등락률</th>
+                <th className="text-center py-3.5 w-24 hidden sm:table-cell"></th>
+                <th className="text-right py-3.5">동조율</th>
+                <th className="text-right py-3.5 hidden md:table-cell">종목수</th>
+                <th className="text-left py-3.5 pl-5 hidden lg:table-cell">대장주</th>
                 <th className="w-5"></th>
               </tr>
             </thead>

@@ -8,11 +8,11 @@ export function SectionHeader({ icon, title, subtitle, delay = 0 }: {
       initial={{ opacity: 0, x: -8 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.4, delay }}
-      className="flex items-center gap-2 mb-4"
+      className="flex items-baseline gap-2.5 mb-5"
     >
-      <span className="text-base">{icon}</span>
-      <h2 className="text-sm font-semibold text-[var(--text-primary)] tracking-tight">{title}</h2>
-      {subtitle && <span className="text-xs text-[var(--text-tertiary)] ml-1">{subtitle}</span>}
+      <div className="w-1 h-4 rounded-full bg-gradient-to-b from-[var(--color-accent)] to-[var(--color-accent)]/30 translate-y-[1px]" />
+      <h2 className="text-[13px] font-semibold text-[var(--text-primary)] tracking-tight">{title}</h2>
+      {subtitle && <span className="text-[11px] text-[var(--text-muted)] font-mono">{subtitle}</span>}
     </motion.div>
   )
 }

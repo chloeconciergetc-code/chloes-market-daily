@@ -53,8 +53,10 @@ export function NewHighTable({ data }: { data: ScannerStock[] }) {
                   transition={{ delay: 0.02 * Math.min(i, 20) }}
                   className="border-t border-white/[0.03] hover:bg-white/[0.03] transition-colors duration-150 group">
                   <td className="py-3 px-5">
-                    <div className="font-medium text-[var(--text-primary)] group-hover:text-white transition-colors">{s.name}</div>
-                    <div className="text-[10px] text-[var(--text-muted)] font-mono mt-0.5">{s.ticker}</div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium text-[var(--text-primary)] group-hover:text-white transition-colors">{s.name}</span>
+                      <span className="text-[9px] text-[var(--text-muted)] font-mono opacity-0 group-hover:opacity-100 transition-opacity">{s.ticker}</span>
+                    </div>
                   </td>
                   <td className="py-3 text-right font-mono text-xs">{fmtNum(s.close)}</td>
                   <td className={`py-3 text-right font-mono text-xs font-semibold ${s.changePct >= 0 ? 'text-[var(--color-up)]' : 'text-[var(--color-down)]'}`}>
