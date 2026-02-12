@@ -5,6 +5,7 @@ from datetime import datetime, date, timedelta
 from decimal import Decimal
 import psycopg2
 from dotenv import load_dotenv
+import yfinance as yf
 
 load_dotenv('/Users/home_mac_mini/.openclaw/workspace/kospi200_etl/.env')
 
@@ -47,55 +48,52 @@ def extract_meta(cur, latest):
         'buildTime': datetime.now().isoformat(),
     })
 
-# ─── INDEX CHART DATA (simulate via top market cap stocks) ───
+# ─── INDEX CHART DATA (real index via yfinance) ───
 def extract_index(cur, universe, latest, trade_dates):
-    """Build pseudo-index from top 50 market cap stocks' average OHLCV."""
-    dates_60 = trade_dates[-60:]
+    """Fetch real KOSPI/KOSDAQ index data from Yahoo Finance."""
+    yahoo_ticker = '^KS11' if universe == 'KOSPI' else '^KQ11'
     
-    # Get top 50 by market cap
-    cur.execute("""
-        SELECT ticker FROM market.market_caps 
-        WHERE trade_date = %s AND ticker IN (
-            SELECT ticker FROM market.universe_members WHERE universe = %s AND as_of_date = (
-                SELECT MAX(as_of_date) FROM market.universe_members WHERE universe = %s
-            )
-        )
-        ORDER BY market_cap DESC NULLS LAST LIMIT 50
-    """, (latest, universe, universe))
-    top_tickers = [r[0] for r in cur.fetchall()]
+    # Fetch ~4 months to ensure 60 trading days
+    start_date = (latest - timedelta(days=120)).isoformat()
+    end_date = (latest + timedelta(days=1)).isoformat()
     
-    if not top_tickers:
-        print(f"  ⚠️ No top tickers for {universe}, skipping index")
+    print(f"  Fetching {yahoo_ticker} from Yahoo Finance ({start_date} ~ {end_date})...")
+    df = yf.download(yahoo_ticker, start=start_date, end=end_date, progress=False)
+    
+    if df.empty:
+        print(f"  ⚠️ No data from Yahoo Finance for {universe}, skipping")
         return
     
+    # Flatten MultiIndex columns if present
+    if hasattr(df.columns, 'levels') and df.columns.nlevels > 1:
+        df.columns = df.columns.get_level_values(0)
+    
+    # Filter out rows where OHLC are all 0 (incomplete data)
+    df = df[(df['Open'] > 0) & (df['High'] > 0) & (df['Low'] > 0) & (df['Close'] > 0)]
+    
+    # Take last 60 trading days
+    df = df.tail(60)
+    
     candles = []
-    for td in dates_60:
-        placeholders = ','.join(['%s'] * len(top_tickers))
-        cur.execute(f"""
-            SELECT AVG(open), AVG(high), AVG(low), AVG(close), SUM(volume)
-            FROM market.daily_bars 
-            WHERE trade_date = %s AND ticker IN ({placeholders})
-            AND volume > 0 AND volume IS NOT NULL
-        """, [td] + top_tickers)
-        row = cur.fetchone()
-        if row and row[0]:
-            candles.append({
-                'd': td.strftime('%m%d'),
-                'date': td.isoformat(),
-                'o': round(float(row[0]), 0),
-                'h': round(float(row[1]), 0),
-                'l': round(float(row[2]), 0),
-                'c': round(float(row[3]), 0),
-                'v': round(float(row[4]) / 1_000_000, 1),  # 백만주
-            })
+    for idx, row in df.iterrows():
+        td = idx.date() if hasattr(idx, 'date') else idx
+        candles.append({
+            'd': td.strftime('%m%d'),
+            'date': td.isoformat(),
+            'o': round(float(row['Open']), 2),
+            'h': round(float(row['High']), 2),
+            'l': round(float(row['Low']), 2),
+            'c': round(float(row['Close']), 2),
+            'v': round(float(row['Volume']) / 1_000_000, 1) if row['Volume'] > 0 else None,
+        })
     
     # Compute MA20 / MA60
     closes = [c['c'] for c in candles]
     ma20 = []
     ma60 = []
     for i in range(len(closes)):
-        ma20.append(round(sum(closes[max(0,i-19):i+1]) / min(20, i+1), 0) if i >= 0 else None)
-        ma60.append(round(sum(closes[max(0,i-59):i+1]) / min(60, i+1), 0) if i >= 0 else None)
+        ma20.append(round(sum(closes[max(0,i-19):i+1]) / min(20, i+1), 2))
+        ma60.append(round(sum(closes[max(0,i-59):i+1]) / min(60, i+1), 2))
     
     fname = f"index-{'kospi' if universe == 'KOSPI' else 'kosdaq'}.json"
     save(fname, {'candles': candles, 'ma20': ma20, 'ma60': ma60})
