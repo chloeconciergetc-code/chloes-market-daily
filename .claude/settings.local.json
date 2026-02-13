@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(tree:*)",
+      "Bash(gh auth status:*)",
+      "Bash(git --version:*)",
+      "Bash(brew list:*)",
+      "Bash(node --version:*)",
+      "mcp__sequential-thinking__sequentialthinking",
+      "Bash(python3:*)",
+      "Bash(~/bin/gh auth login:*)",
+      "Bash(git init:*)",
+      "Bash(git branch:*)",
+      "Bash(git add:*)"
+    ]
+  }
+}
