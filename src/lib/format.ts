@@ -18,3 +18,14 @@ export function fmtMarketCap(n: number): string {
   if (n >= 10000) return `${(n / 10000).toFixed(1)}조`
   return `${fmtNum(n)}억`
 }
+
+export function fmtTradingValue(n: number): string {
+  const eok = n / 1e8
+  if (eok >= 10000) return `${(eok / 10000).toFixed(1)}조`
+  if (eok >= 1) return `${eok.toFixed(0)}억`
+  return `${(n / 1e4).toFixed(0)}만`
+}
+
+export function fmtDateLabel(dateStr: string): string {
+  return dateStr.slice(5, 7) + '.' + dateStr.slice(8, 10)
+}

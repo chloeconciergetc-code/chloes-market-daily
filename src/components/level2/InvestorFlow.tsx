@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { scaleLinear } from 'd3-scale'
+import { fmtDateLabel } from '../../lib/format'
 import { Card } from '../ui/Card'
 import { SectionHeader } from '../ui/SectionHeader'
 import type { InvestorFlowData, InvestorFlowDay } from '../../types/market'
@@ -41,6 +42,8 @@ function BarChart({ data, width = 600, height = 220 }: { data: InvestorFlowDay[]
       {data.map((d, i) => {
         const x = margin.left + i * barGroupW + barGroupW * 0.15
         const zero = yScale(0) + margin.top
+        const labelInterval = Math.max(1, Math.ceil(data.length / 5))
+        const showLabel = i % labelInterval === 0 || i === data.length - 1
 
         const drawBar = (val: number, offset: number, color: string) => {
           const h = Math.abs(yScale(0) - yScale(val))
@@ -53,10 +56,12 @@ function BarChart({ data, width = 600, height = 220 }: { data: InvestorFlowDay[]
             {drawBar(d.foreign, 0, colors.foreign)}
             {drawBar(d.institution, 1, colors.institution)}
             {drawBar(d.individual, 2, colors.individual)}
-            <text x={x + barGroupW * 0.35} y={height - 4}
-              fill="var(--text-muted)" fontSize={9} fontFamily="var(--font-mono)" textAnchor="middle">
-              {d.date.slice(5)}
-            </text>
+            {showLabel && (
+              <text x={x + barGroupW * 0.35} y={height - 4}
+                fill="rgba(255,255,255,0.4)" fontSize={10} fontFamily="var(--font-mono)" textAnchor="middle">
+                {fmtDateLabel(d.date)}
+              </text>
+            )}
           </g>
         )
       })}

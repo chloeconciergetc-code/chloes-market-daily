@@ -1,17 +1,17 @@
 import { useState } from 'react'
 import { Card } from '../ui/Card'
 import { SectionHeader } from '../ui/SectionHeader'
-import { fmtNum, fmtMarketCap, fmtVolume } from '../../lib/format'
+import { fmtNum, fmtMarketCap, fmtTradingValue } from '../../lib/format'
 import type { ScannerStock } from '../../types/market'
 
-const sortLabels = { marketCap: '시총', changePct: '등락률', volume: '거래량' } as const
+const sortLabels = { marketCap: '시총', changePct: '등락률', volume: '거래금액' } as const
 
 export function NewLowTable({ data }: { data: ScannerStock[] }) {
   const [sortBy, setSortBy] = useState<'marketCap' | 'changePct' | 'volume'>('marketCap')
 
   const sorted = [...data].sort((a, b) => {
     if (sortBy === 'changePct') return a.changePct - b.changePct
-    if (sortBy === 'volume') return b.volume - a.volume
+    if (sortBy === 'volume') return (b.close * b.volume) - (a.close * a.volume)
     return b.marketCap - a.marketCap
   })
 
@@ -24,7 +24,7 @@ export function NewLowTable({ data }: { data: ScannerStock[] }) {
             <button key={key} onClick={() => setSortBy(key)}
               className={`px-2.5 py-1 font-semibold tracking-wide uppercase rounded-[var(--radius-sm)] transition-all duration-200 ${
                 sortBy === key
-                  ? 'bg-[var(--bg-elevated)] text-[var(--text-primary)]'
+                  ? 'bg-[var(--color-accent-soft)] text-[var(--color-accent)]'
                   : 'text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-subtle)]'
               }`}
               style={{ fontSize: 'var(--text-micro)' }}>
@@ -41,7 +41,7 @@ export function NewLowTable({ data }: { data: ScannerStock[] }) {
                 <th className="text-right py-2.5 min-w-[90px]">종가</th>
                 <th className="text-right py-2.5">등락률</th>
                 <th className="text-right py-2.5 hidden md:table-cell">시총</th>
-                <th className="text-right py-2.5 pr-5 hidden lg:table-cell">거래량</th>
+                <th className="text-right py-2.5 pr-5 hidden lg:table-cell">거래금액</th>
               </tr>
             </thead>
             <tbody>
@@ -62,7 +62,7 @@ export function NewLowTable({ data }: { data: ScannerStock[] }) {
                     {fmtMarketCap(s.marketCap)}
                   </td>
                   <td className="py-2.5 text-right text-[var(--text-muted)] font-mono pr-5 hidden lg:table-cell" style={{ fontSize: 'var(--text-body)' }}>
-                    {fmtVolume(s.volume)}
+                    {fmtTradingValue(s.close * s.volume)}
                   </td>
                 </tr>
               ))}

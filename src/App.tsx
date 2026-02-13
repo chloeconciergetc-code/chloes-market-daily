@@ -115,74 +115,90 @@ export default function App() {
       <Header date={meta?.dataDate} />
       <CompactNav />
 
-      <div className="space-y-8 mt-6">
-        {/* Hero Dashboard */}
-        {regime && (
-          <section id="section-hero" className="scroll-mt-16 animate-fade-in">
-            <HeroDashboard
-              regime={regime}
-              kospi={kospi ?? undefined}
-              kosdaq={kosdaq ?? undefined}
-              investorFlow={investorFlow ?? undefined}
-            />
-          </section>
-        )}
-
-        {/* Market Pulse (시장 체온계) */}
-        {summary && (
-          <section id="section-pulse" className="scroll-mt-16">
-            <MarketPulse data={summary} breadth={breadth ?? undefined} />
-          </section>
-        )}
-
-        {/* Index Charts */}
-        <section id="section-index" className="scroll-mt-16">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            {kospi && (
-              <Card>
-                <IndexCandlestickChart data={kospi} label="KOSPI" />
-              </Card>
-            )}
-            {kosdaq && (
-              <Card>
-                <IndexCandlestickChart data={kosdaq} label="KOSDAQ" />
-              </Card>
-            )}
-          </div>
-          {kospi && kosdaq && (
-            <div className="mt-4">
-              <Card>
-                <IndexOverlayChart kospi={kospi} kosdaq={kosdaq} />
-              </Card>
-            </div>
+      <div className="mt-6">
+        {/* ── GROUP 1: Overview ── */}
+        <div className="space-y-6">
+          {regime && (
+            <section id="section-hero" className="scroll-mt-16 animate-fade-in">
+              <HeroDashboard
+                regime={regime}
+                kospi={kospi ?? undefined}
+                kosdaq={kosdaq ?? undefined}
+                investorFlow={investorFlow ?? undefined}
+              />
+            </section>
           )}
-        </section>
 
-        {/* Investor Flow */}
-        {investorFlow && (
-          <section id="section-investor" className="scroll-mt-16">
-            <InvestorFlow data={investorFlow} />
+          {summary && (
+            <section id="section-pulse" className="scroll-mt-16">
+              <MarketPulse data={summary} breadth={breadth ?? undefined} />
+            </section>
+          )}
+        </div>
+
+        <div className="my-10 mx-auto w-16 h-px bg-[var(--border-default)]" />
+
+        {/* ── GROUP 2: Price Action ── */}
+        <div className="space-y-4">
+          <section id="section-index" className="scroll-mt-16">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {kospi && (
+                <Card>
+                  <IndexCandlestickChart data={kospi} label="KOSPI" />
+                </Card>
+              )}
+              {kosdaq && (
+                <Card>
+                  <IndexCandlestickChart data={kosdaq} label="KOSDAQ" />
+                </Card>
+              )}
+            </div>
+            {kospi && kosdaq && (
+              <div className="mt-4">
+                <Card>
+                  <IndexOverlayChart kospi={kospi} kosdaq={kosdaq} />
+                </Card>
+              </div>
+            )}
           </section>
-        )}
+        </div>
 
-        {/* Breadth */}
-        {breadth && (
-          <section id="section-breadth" className="scroll-mt-16">
-            <BreadthSection data={breadth} />
+        <div className="my-10 mx-auto w-16 h-px bg-[var(--border-default)]" />
+
+        {/* ── GROUP 3: Market Internals ── */}
+        <div className="space-y-6">
+          {investorFlow && (
+            <section id="section-investor" className="scroll-mt-16">
+              <InvestorFlow data={investorFlow} />
+            </section>
+          )}
+
+          {breadth && (
+            <section id="section-breadth" className="scroll-mt-16">
+              <BreadthSection data={breadth} />
+            </section>
+          )}
+        </div>
+
+        <div className="my-10 mx-auto w-16 h-px bg-[var(--border-default)]" />
+
+        {/* ── GROUP 4: Themes ── */}
+        <div className="space-y-6">
+          <section id="section-themes" className="scroll-mt-16">
+            {themes && <ThemeMomentum data={themes} />}
+            {themes && <div className="mt-4"><SectorHeatmap data={themes.heatmap} /></div>}
           </section>
-        )}
+        </div>
 
-        {/* Themes + Heatmap */}
-        <section id="section-themes" className="scroll-mt-16">
-          {themes && <ThemeMomentum data={themes} />}
-          {themes && <div className="mt-4"><SectorHeatmap data={themes.heatmap} /></div>}
-        </section>
+        <div className="my-10 mx-auto w-16 h-px bg-[var(--border-default)]" />
 
-        {/* Scanner */}
-        <section id="section-scanner" className="scroll-mt-16">
-          {newHighs && <NewHighTable data={newHighs} />}
-          {newLows && newLows.length > 0 && <div className="mt-4"><NewLowTable data={newLows} /></div>}
-        </section>
+        {/* ── GROUP 5: Scanner ── */}
+        <div className="space-y-6">
+          <section id="section-scanner" className="scroll-mt-16">
+            {newHighs && <NewHighTable data={newHighs} />}
+            {newLows && newLows.length > 0 && <div className="mt-6"><NewLowTable data={newLows} /></div>}
+          </section>
+        </div>
       </div>
 
       <Footer />

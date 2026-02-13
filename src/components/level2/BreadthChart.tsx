@@ -13,7 +13,7 @@ const tooltipStyle = {
   boxShadow: 'var(--shadow-elevated)',
 }
 
-const tickStyle = { fill: 'rgba(255,255,255,0.35)', fontSize: 10, fontFamily: 'var(--font-mono)' }
+const tickStyle = { fill: 'rgba(255,255,255,0.4)', fontSize: 10, fontFamily: 'var(--font-mono)' }
 
 export function BreadthSection({ data }: { data: BreadthDay[] }) {
   return (
@@ -30,7 +30,7 @@ export function BreadthSection({ data }: { data: BreadthDay[] }) {
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 6" stroke="rgba(255,255,255,0.03)" vertical={false} />
-              <XAxis dataKey="date" tickFormatter={d => d.slice(5)} tick={tickStyle} axisLine={false} tickLine={false} interval="preserveStartEnd" dy={8} />
+              <XAxis dataKey="date" tickFormatter={d => d.slice(5, 7) + '.' + d.slice(8, 10)} tick={tickStyle} axisLine={false} tickLine={false} interval="preserveStartEnd" dy={8} />
               <YAxis domain={[0, 100]} tick={tickStyle} axisLine={false} tickLine={false} tickFormatter={v => `${v}%`} width={38} />
               <ReferenceLine y={50} stroke="rgba(255,255,255,0.06)" strokeDasharray="4 4" />
               <ReferenceLine y={70} stroke="rgba(239,68,68,0.15)" strokeDasharray="3 3" label={{ value: '과열', position: 'right', fill: 'rgba(239,68,68,0.4)', fontSize: 9 }} />
@@ -51,7 +51,7 @@ export function BreadthSection({ data }: { data: BreadthDay[] }) {
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 6" stroke="rgba(255,255,255,0.03)" vertical={false} />
-              <XAxis dataKey="date" tickFormatter={d => d.slice(5)} tick={tickStyle} axisLine={false} tickLine={false} interval="preserveStartEnd" dy={8} />
+              <XAxis dataKey="date" tickFormatter={d => d.slice(5, 7) + '.' + d.slice(8, 10)} tick={tickStyle} axisLine={false} tickLine={false} interval="preserveStartEnd" dy={8} />
               <YAxis tick={tickStyle} axisLine={false} tickLine={false} width={38} domain={[(min: number) => Math.floor(min - 20), (max: number) => Math.ceil(max + 20)]} />
               <ReferenceLine y={0} stroke="rgba(255,255,255,0.08)" />
               <Tooltip contentStyle={tooltipStyle} cursor={{ stroke: 'rgba(255,255,255,0.08)' }} />

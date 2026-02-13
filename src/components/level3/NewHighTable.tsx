@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { Card } from '../ui/Card'
 import { SectionHeader } from '../ui/SectionHeader'
-import { fmtNum, fmtMarketCap, fmtVolume } from '../../lib/format'
+import { fmtNum, fmtMarketCap, fmtTradingValue } from '../../lib/format'
 import type { ScannerStock } from '../../types/market'
 
-const sortOptions = { marketCap: '시총', changePct: '등락률', volume: '거래량' } as const
+const sortOptions = { marketCap: '시총', changePct: '등락률', volume: '거래금액' } as const
 type SortKey = keyof typeof sortOptions
 
 function SortButton({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
@@ -24,7 +24,7 @@ export function NewHighTable({ data }: { data: ScannerStock[] }) {
 
   const sorted = [...data].sort((a, b) => {
     if (sortBy === 'changePct') return b.changePct - a.changePct
-    if (sortBy === 'volume') return b.volume - a.volume
+    if (sortBy === 'volume') return (b.close * b.volume) - (a.close * a.volume)
     return b.marketCap - a.marketCap
   })
 
@@ -46,8 +46,7 @@ export function NewHighTable({ data }: { data: ScannerStock[] }) {
                 <th className="text-right py-2.5 min-w-[90px]">종가</th>
                 <th className="text-right py-2.5">등락률</th>
                 <th className="text-right py-2.5 hidden md:table-cell">시총</th>
-                <th className="text-right py-2.5 hidden lg:table-cell">거래량</th>
-                <th className="text-right py-2.5 pr-5 hidden xl:table-cell">Vol배율</th>
+                <th className="text-right py-2.5 pr-5 hidden lg:table-cell">거래금액</th>
               </tr>
             </thead>
             <tbody>
@@ -67,15 +66,8 @@ export function NewHighTable({ data }: { data: ScannerStock[] }) {
                   <td className="py-2.5 text-right text-[var(--text-tertiary)] font-mono hidden md:table-cell" style={{ fontSize: 'var(--text-body)' }}>
                     {fmtMarketCap(s.marketCap)}
                   </td>
-                  <td className="py-2.5 text-right text-[var(--text-muted)] font-mono hidden lg:table-cell" style={{ fontSize: 'var(--text-body)' }}>
-                    {fmtVolume(s.volume)}
-                  </td>
-                  <td className={`py-2.5 text-right font-mono pr-5 hidden xl:table-cell font-semibold ${
-                    s.volRatio && s.volRatio >= 3 ? 'text-[var(--color-up)]' :
-                    s.volRatio && s.volRatio >= 1.5 ? 'text-[var(--text-secondary)]' :
-                    'text-[var(--text-muted)]'
-                  }`} style={{ fontSize: 'var(--text-body)' }}>
-                    {s.volRatio != null ? `${s.volRatio}x` : '-'}
+                  <td className="py-2.5 text-right text-[var(--text-muted)] font-mono pr-5 hidden lg:table-cell" style={{ fontSize: 'var(--text-body)' }}>
+                    {fmtTradingValue(s.close * s.volume)}
                   </td>
                 </tr>
               ))}

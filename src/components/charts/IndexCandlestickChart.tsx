@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { scaleLinear } from 'd3-scale'
+import { fmtDateLabel } from '../../lib/format'
 import type { IndexChartData } from '../../types/market'
 
 interface Props {
@@ -14,10 +15,10 @@ export function IndexCandlestickChart({ data, label, width = 600, height = 300 }
   const [showMA, setShowMA] = useState(true)
   if (!candles.length) return null
 
-  const chartH = height * 0.7
-  const volH = height * 0.18
+  const chartH = height * 0.65
+  const volH = height * 0.15
   const gap = height * 0.04
-  const margin = { top: 20, right: 52, left: 8, bottom: 4 }
+  const margin = { top: 20, right: 52, left: 8, bottom: 20 }
   const innerW = width - margin.left - margin.right
 
   const xScale = scaleLinear().domain([0, candles.length - 1]).range([margin.left, width - margin.right])
@@ -109,6 +110,18 @@ export function IndexCandlestickChart({ data, label, width = 600, height = 300 }
               opacity={0.15}
               rx={0.5}
             />
+          )
+        })}
+
+        {candles.map((c, i) => {
+          const interval = Math.max(1, Math.ceil(candles.length / 6))
+          if (i % interval !== 0 && i !== candles.length - 1) return null
+          return (
+            <text key={`dl-${i}`} x={xScale(i)} y={chartH + gap + volH + 14}
+              fill="rgba(255,255,255,0.4)" fontSize={10}
+              fontFamily="var(--font-mono)" textAnchor="middle">
+              {fmtDateLabel(c.date)}
+            </text>
           )
         })}
 

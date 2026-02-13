@@ -36,7 +36,7 @@ export function IndexOverlayChart({ kospi, kosdaq, width = 600, height = 260 }: 
   const lastKosdaq = kosdaqN[len - 1]
   const yTicks = Array.from({ length: 4 }, (_, i) => yMin + (yMax - yMin) * (i + 0.5) / 4)
   const dateLabels = kospiN.slice(0, len)
-    .map((c, i) => ({ i, label: c.date.slice(5, 7) + '/' + c.date.slice(8, 10) }))
+    .map((c, i) => ({ i, label: c.date.slice(5, 7) + '.' + c.date.slice(8, 10) }))
     .filter((_, i) => i % Math.max(1, Math.floor(len / 6)) === 0)
 
   return (
@@ -65,7 +65,7 @@ export function IndexOverlayChart({ kospi, kosdaq, width = 600, height = 260 }: 
 
         {dateLabels.map(({ i, label }) => (
           <text key={i} x={xScale(i)} y={height - 4}
-            fill="var(--text-muted)" fontSize={8} fontFamily="var(--font-mono)" textAnchor="middle">{label}</text>
+            fill="rgba(255,255,255,0.4)" fontSize={10} fontFamily="var(--font-mono)" textAnchor="middle">{label}</text>
         ))}
 
         <g>
