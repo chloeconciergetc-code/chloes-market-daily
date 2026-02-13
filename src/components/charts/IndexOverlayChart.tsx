@@ -8,7 +8,7 @@ interface Props {
   height?: number
 }
 
-export function IndexOverlayChart({ kospi, kosdaq, width = 600, height = 260 }: Props) {
+export function IndexOverlayChart({ kospi, kosdaq, width = 600, height = 240 }: Props) {
   const margin = { top: 20, right: 52, left: 8, bottom: 20 }
 
   const normalize = (candles: typeof kospi.candles) => {
@@ -42,8 +42,8 @@ export function IndexOverlayChart({ kospi, kosdaq, width = 600, height = 260 }: 
   return (
     <div>
       <div className="flex items-baseline gap-2 mb-2">
-        <span className="font-semibold tracking-wide text-[var(--text-tertiary)] uppercase" style={{ fontSize: 'var(--text-caption)' }}>KOSPI vs KOSDAQ</span>
-        <span className="text-[var(--text-muted)]" style={{ fontSize: 'var(--text-micro)' }}>기간 시작일 = 100</span>
+        <span className="font-semibold tracking-wide text-[var(--text-tertiary)] uppercase fs-caption">KOSPI vs KOSDAQ</span>
+        <span className="text-[var(--text-muted)] fs-micro">기간 시작일 = 100</span>
       </div>
       <svg viewBox={`0 0 ${width} ${height}`} className="w-full" preserveAspectRatio="xMidYMid meet">
         {yTicks.map((val, i) => (
@@ -92,7 +92,7 @@ export function IndexOverlayChart({ kospi, kosdaq, width = 600, height = 260 }: 
         </g>
       </svg>
 
-      <div className="flex items-center justify-center gap-3 mt-1.5 text-[var(--text-secondary)] font-mono" style={{ fontSize: 'var(--text-caption)' }}>
+      <div className="flex items-center justify-center gap-3 mt-1.5 text-[var(--text-secondary)] font-mono fs-caption">
         <span>KOSPI {lastKospi.norm >= 100 ? '+' : ''}{(lastKospi.norm - 100).toFixed(1)}%</span>
         <span className="text-[var(--text-muted)]">·</span>
         <span>KOSDAQ {lastKosdaq.norm >= 100 ? '+' : ''}{(lastKosdaq.norm - 100).toFixed(1)}%</span>

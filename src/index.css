@@ -52,6 +52,15 @@ body {
 .text-down { color: var(--color-down); }
 .text-flat { color: var(--color-flat); }
 
+/* ── Typography Size Utilities ── */
+.fs-hero { font-size: var(--text-hero); }
+.fs-display { font-size: var(--text-display); }
+.fs-headline { font-size: var(--text-headline); }
+.fs-title { font-size: var(--text-title); }
+.fs-body { font-size: var(--text-body); }
+.fs-caption { font-size: var(--text-caption); }
+.fs-micro { font-size: var(--text-micro); }
+
 /* ── Scrollbar hide for nav ── */
 .scrollbar-hide {
   -ms-overflow-style: none;

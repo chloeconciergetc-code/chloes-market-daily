@@ -111,4 +111,19 @@
   --duration-fast: 150ms;
   --duration-normal: 250ms;
   --duration-slow: 500ms;
+
+  /* ── Layout ── */
+  --content-max: 1200px;
+  --grid-gap: 16px;
+  --section-gap: 48px;
+  --nav-height: 44px;
+
+  /* ── Table ── */
+  --bg-row-alt: rgba(255, 255, 255, 0.015);
+  --bg-row-hover: rgba(255, 255, 255, 0.025);
+
+  /* ── Chart Heights (standardized) ── */
+  --chart-height-lg: 280px;
+  --chart-height-md: 240px;
+  --chart-height-heatmap: 360px;
 }

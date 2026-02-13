@@ -10,7 +10,7 @@ interface Props {
   height?: number
 }
 
-export function IndexCandlestickChart({ data, label, width = 600, height = 300 }: Props) {
+export function IndexCandlestickChart({ data, label, width = 600, height = 280 }: Props) {
   const { candles, ma20, ma60 } = data
   const [showMA, setShowMA] = useState(true)
   if (!candles.length) return null
@@ -45,11 +45,10 @@ export function IndexCandlestickChart({ data, label, width = 600, height = 300 }
   return (
     <div>
       <div className="flex items-baseline gap-2 mb-3 flex-wrap">
-        <span className="font-semibold tracking-wide text-[var(--text-tertiary)] uppercase" style={{ fontSize: 'var(--text-caption)' }}>{label}</span>
-        <span className="font-mono font-bold tracking-tight" style={{ fontSize: 'var(--text-headline)' }}>{lastCandle.c.toLocaleString()}</span>
-        <span className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-[var(--radius-xs)] font-mono font-medium
-          ${isUp ? 'bg-[var(--color-up-soft)] text-[var(--color-up)]' : 'bg-[var(--color-down-soft)] text-[var(--color-down)]'}`}
-          style={{ fontSize: 'var(--text-micro)' }}>
+        <span className="font-semibold tracking-wide text-[var(--text-tertiary)] uppercase fs-caption">{label}</span>
+        <span className="font-mono font-bold tracking-tight fs-headline">{lastCandle.c.toLocaleString()}</span>
+        <span className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-[var(--radius-xs)] font-mono font-medium fs-micro
+          ${isUp ? 'bg-[var(--color-up-soft)] text-[var(--color-up)]' : 'bg-[var(--color-down-soft)] text-[var(--color-down)]'}`}>
           {isUp ? '↑' : '↓'} {Math.abs(dayChange).toLocaleString()} ({dayChangePct > 0 ? '+' : ''}{dayChangePct.toFixed(2)}%)
         </span>
         <button onClick={() => setShowMA(v => !v)}
