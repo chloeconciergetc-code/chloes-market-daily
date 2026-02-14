@@ -62,10 +62,18 @@ export interface SectorPerf {
   stockCount: number
 }
 
+export interface HeatmapStock {
+  name: string
+  ticker: string
+  value: number       // 시가총액 (억원) — treemap 면적 기준
+  change: number      // 등락률 %
+  sector: string
+}
+
 export interface ThemesData {
   top10: ThemeItem[]
   bottom10?: ThemeItem[]
-  heatmap: { name: string; value: number; change: number }[]
+  heatmap: HeatmapStock[]
   total: number
   sectorPerformance?: SectorPerf[] // Phase 2: 섹터별 등락률
 }
@@ -92,6 +100,30 @@ export interface MarketRegimeData {
   label: string
   components: Record<string, number>
   weights: Record<string, number>
+}
+
+// WICS Industry Classification
+export interface WicsStock {
+  ticker: string
+  name: string
+  marketCap: number       // 억원
+  change: number          // daily change %
+  market: 'KOSPI' | 'KOSDAQ'
+  weight: number          // WICS 내 비중 %
+}
+
+export interface WicsIndustry {
+  code: string            // "G2510"
+  name: string            // "반도체와반도체장비"
+  totalMarketCap: number  // 억원
+  avgChange: number       // 시총 가중평균 등락률 %
+  stockCount: number
+  stocks: WicsStock[]     // 시총 내림차순 정렬
+}
+
+export interface WicsHeatmapData {
+  date: string
+  industries: WicsIndustry[]
 }
 
 export interface ScannerStock {

@@ -2,9 +2,11 @@ interface TreemapNode {
   name: string
   value: number
   change: number
+  ticker?: string
+  sector?: string
 }
 
-interface LayoutRect {
+export interface LayoutRect {
   x: number
   y: number
   w: number
@@ -12,6 +14,8 @@ interface LayoutRect {
   name: string
   value: number
   change: number
+  ticker: string
+  sector: string
 }
 
 function worst(row: number[], w: number): number {
@@ -42,11 +46,11 @@ export function squarify(data: TreemapNode[], width: number, height: number): La
       let cx = x
       for (let i = 0; i < row.length; i++) {
         const cellW = row[i] / rowH
+        const node = sorted[indices[i]]
         results.push({
           x: cx, y, w: cellW, h: rowH,
-          name: sorted[indices[i]].name,
-          value: sorted[indices[i]].value,
-          change: sorted[indices[i]].change,
+          name: node.name, value: node.value, change: node.change,
+          ticker: node.ticker ?? '', sector: node.sector ?? '',
         })
         cx += cellW
       }
@@ -57,11 +61,11 @@ export function squarify(data: TreemapNode[], width: number, height: number): La
       let cy = y
       for (let i = 0; i < row.length; i++) {
         const cellH = row[i] / rowW
+        const node = sorted[indices[i]]
         results.push({
           x, y: cy, w: rowW, h: cellH,
-          name: sorted[indices[i]].name,
-          value: sorted[indices[i]].value,
-          change: sorted[indices[i]].change,
+          name: node.name, value: node.value, change: node.change,
+          ticker: node.ticker ?? '', sector: node.sector ?? '',
         })
         cy += cellH
       }

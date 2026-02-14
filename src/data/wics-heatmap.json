@@ -1,0 +1,360 @@
+{
+  "date": "2026-02-12",
+  "industries": [
+    {
+      "code": "G4530",
+      "name": "반도체와반도체장비",
+      "totalMarketCap": 19045410,
+      "avgChange": 1.24,
+      "stockCount": 5,
+      "stocks": [
+        {"ticker": "005930", "name": "삼성전자", "marketCap": 10821098, "change": 1.46, "market": "KOSPI", "weight": 56.8},
+        {"ticker": "000660", "name": "SK하이닉스", "marketCap": 6522901, "change": 0.90, "market": "KOSPI", "weight": 34.2},
+        {"ticker": "402340", "name": "SK스퀘어", "marketCap": 540000, "change": -0.5, "market": "KOSPI", "weight": 2.8},
+        {"ticker": "058470", "name": "리노공업", "marketCap": 170000, "change": 2.1, "market": "KOSDAQ", "weight": 0.9},
+        {"ticker": "357780", "name": "솔브레인", "marketCap": 150000, "change": -1.2, "market": "KOSDAQ", "weight": 0.8}
+      ]
+    },
+    {
+      "code": "G4510",
+      "name": "소프트웨어와서비스",
+      "totalMarketCap": 5200000,
+      "avgChange": -0.65,
+      "stockCount": 5,
+      "stocks": [
+        {"ticker": "035420", "name": "NAVER", "marketCap": 3500000, "change": -0.50, "market": "KOSPI", "weight": 67.3},
+        {"ticker": "035720", "name": "카카오", "marketCap": 1200000, "change": -1.80, "market": "KOSPI", "weight": 23.1},
+        {"ticker": "036570", "name": "엔씨소프트", "marketCap": 250000, "change": 0.30, "market": "KOSPI", "weight": 4.8},
+        {"ticker": "263750", "name": "펄어비스", "marketCap": 150000, "change": 3.20, "market": "KOSDAQ", "weight": 2.9},
+        {"ticker": "293490", "name": "카카오게임즈", "marketCap": 100000, "change": -0.80, "market": "KOSPI", "weight": 1.9}
+      ]
+    },
+    {
+      "code": "G4520",
+      "name": "기술하드웨어와장비",
+      "totalMarketCap": 3800000,
+      "avgChange": 0.45,
+      "stockCount": 4,
+      "stocks": [
+        {"ticker": "066570", "name": "LG전자", "marketCap": 1800000, "change": 0.80, "market": "KOSPI", "weight": 47.4},
+        {"ticker": "009150", "name": "삼성전기", "marketCap": 1000000, "change": -0.30, "market": "KOSPI", "weight": 26.3},
+        {"ticker": "034220", "name": "LG디스플레이", "marketCap": 600000, "change": 1.20, "market": "KOSPI", "weight": 15.8},
+        {"ticker": "272210", "name": "한화시스템", "marketCap": 400000, "change": 0.50, "market": "KOSPI", "weight": 10.5}
+      ]
+    },
+    {
+      "code": "G4535",
+      "name": "전자와전기제품",
+      "totalMarketCap": 2100000,
+      "avgChange": 0.88,
+      "stockCount": 4,
+      "stocks": [
+        {"ticker": "006400", "name": "삼성SDI", "marketCap": 900000, "change": 1.50, "market": "KOSPI", "weight": 42.9},
+        {"ticker": "051910", "name": "LG화학", "marketCap": 650000, "change": 0.30, "market": "KOSPI", "weight": 31.0},
+        {"ticker": "247540", "name": "에코프로비엠", "marketCap": 350000, "change": 0.80, "market": "KOSDAQ", "weight": 16.7},
+        {"ticker": "373220", "name": "LG에너지솔루션", "marketCap": 200000, "change": -0.20, "market": "KOSPI", "weight": 9.5}
+      ]
+    },
+    {
+      "code": "G4540",
+      "name": "디스플레이",
+      "totalMarketCap": 800000,
+      "avgChange": -0.32,
+      "stockCount": 3,
+      "stocks": [
+        {"ticker": "034220", "name": "LG디스플레이", "marketCap": 450000, "change": -0.50, "market": "KOSPI", "weight": 56.3},
+        {"ticker": "272290", "name": "이녹스첨단소재", "marketCap": 200000, "change": 0.20, "market": "KOSDAQ", "weight": 25.0},
+        {"ticker": "131970", "name": "테스나", "marketCap": 150000, "change": -0.70, "market": "KOSDAQ", "weight": 18.7}
+      ]
+    },
+    {
+      "code": "G4010",
+      "name": "은행",
+      "totalMarketCap": 4500000,
+      "avgChange": 0.72,
+      "stockCount": 4,
+      "stocks": [
+        {"ticker": "055550", "name": "신한지주", "marketCap": 1500000, "change": 0.80, "market": "KOSPI", "weight": 33.3},
+        {"ticker": "105560", "name": "KB금융", "marketCap": 1400000, "change": 1.10, "market": "KOSPI", "weight": 31.1},
+        {"ticker": "086790", "name": "하나금융지주", "marketCap": 900000, "change": 0.30, "market": "KOSPI", "weight": 20.0},
+        {"ticker": "316140", "name": "우리금융지주", "marketCap": 700000, "change": 0.50, "market": "KOSPI", "weight": 15.6}
+      ]
+    },
+    {
+      "code": "G4020",
+      "name": "증권",
+      "totalMarketCap": 1200000,
+      "avgChange": -0.15,
+      "stockCount": 4,
+      "stocks": [
+        {"ticker": "003540", "name": "대신증권", "marketCap": 400000, "change": -0.30, "market": "KOSPI", "weight": 33.3},
+        {"ticker": "016360", "name": "삼성증권", "marketCap": 350000, "change": 0.20, "market": "KOSPI", "weight": 29.2},
+        {"ticker": "005940", "name": "NH투자증권", "marketCap": 300000, "change": -0.50, "market": "KOSPI", "weight": 25.0},
+        {"ticker": "030210", "name": "키움증권", "marketCap": 150000, "change": 0.40, "market": "KOSPI", "weight": 12.5}
+      ]
+    },
+    {
+      "code": "G4030",
+      "name": "다각화된금융",
+      "totalMarketCap": 600000,
+      "avgChange": 0.33,
+      "stockCount": 3,
+      "stocks": [
+        {"ticker": "024110", "name": "기업은행", "marketCap": 300000, "change": 0.50, "market": "KOSPI", "weight": 50.0},
+        {"ticker": "138930", "name": "BNK금융지주", "marketCap": 200000, "change": 0.10, "market": "KOSPI", "weight": 33.3},
+        {"ticker": "139130", "name": "DGB금융지주", "marketCap": 100000, "change": 0.30, "market": "KOSPI", "weight": 16.7}
+      ]
+    },
+    {
+      "code": "G4040",
+      "name": "보험",
+      "totalMarketCap": 1800000,
+      "avgChange": 0.55,
+      "stockCount": 3,
+      "stocks": [
+        {"ticker": "032830", "name": "삼성생명", "marketCap": 800000, "change": 0.70, "market": "KOSPI", "weight": 44.4},
+        {"ticker": "000810", "name": "삼성화재", "marketCap": 600000, "change": 0.50, "market": "KOSPI", "weight": 33.3},
+        {"ticker": "088350", "name": "한화생명", "marketCap": 400000, "change": 0.30, "market": "KOSPI", "weight": 22.2}
+      ]
+    },
+    {
+      "code": "G4050",
+      "name": "부동산",
+      "totalMarketCap": 400000,
+      "avgChange": -0.80,
+      "stockCount": 3,
+      "stocks": [
+        {"ticker": "316140", "name": "우리금융지주", "marketCap": 200000, "change": -0.50, "market": "KOSPI", "weight": 50.0},
+        {"ticker": "285130", "name": "SK리츠", "marketCap": 120000, "change": -1.20, "market": "KOSPI", "weight": 30.0},
+        {"ticker": "395400", "name": "SK리얼티", "marketCap": 80000, "change": -0.80, "market": "KOSPI", "weight": 20.0}
+      ]
+    },
+    {
+      "code": "G2510",
+      "name": "자동차와부품",
+      "totalMarketCap": 5500000,
+      "avgChange": 1.85,
+      "stockCount": 5,
+      "stocks": [
+        {"ticker": "005380", "name": "현대차", "marketCap": 2500000, "change": 2.10, "market": "KOSPI", "weight": 45.5},
+        {"ticker": "000270", "name": "기아", "marketCap": 1800000, "change": 1.80, "market": "KOSPI", "weight": 32.7},
+        {"ticker": "012330", "name": "현대모비스", "marketCap": 600000, "change": 1.20, "market": "KOSPI", "weight": 10.9},
+        {"ticker": "018880", "name": "한온시스템", "marketCap": 350000, "change": 0.50, "market": "KOSPI", "weight": 6.4},
+        {"ticker": "161390", "name": "한국타이어앤테크놀로지", "marketCap": 250000, "change": 2.80, "market": "KOSPI", "weight": 4.5}
+      ]
+    },
+    {
+      "code": "G2520",
+      "name": "내구소비재와의류",
+      "totalMarketCap": 1500000,
+      "avgChange": -0.42,
+      "stockCount": 4,
+      "stocks": [
+        {"ticker": "028260", "name": "삼성물산", "marketCap": 700000, "change": -0.30, "market": "KOSPI", "weight": 46.7},
+        {"ticker": "010130", "name": "고려아연", "marketCap": 400000, "change": -0.80, "market": "KOSPI", "weight": 26.7},
+        {"ticker": "069260", "name": "휴켐스", "marketCap": 250000, "change": 0.20, "market": "KOSPI", "weight": 16.7},
+        {"ticker": "090430", "name": "아모레퍼시픽", "marketCap": 150000, "change": -1.00, "market": "KOSPI", "weight": 10.0}
+      ]
+    },
+    {
+      "code": "G2530",
+      "name": "소비자서비스",
+      "totalMarketCap": 900000,
+      "avgChange": 0.25,
+      "stockCount": 3,
+      "stocks": [
+        {"ticker": "004170", "name": "신세계", "marketCap": 400000, "change": 0.50, "market": "KOSPI", "weight": 44.4},
+        {"ticker": "069960", "name": "현대백화점", "marketCap": 300000, "change": -0.20, "market": "KOSPI", "weight": 33.3},
+        {"ticker": "007070", "name": "GS리테일", "marketCap": 200000, "change": 0.50, "market": "KOSPI", "weight": 22.2}
+      ]
+    },
+    {
+      "code": "G2550",
+      "name": "소매(유통)",
+      "totalMarketCap": 700000,
+      "avgChange": -0.18,
+      "stockCount": 3,
+      "stocks": [
+        {"ticker": "139480", "name": "이마트", "marketCap": 300000, "change": 0.30, "market": "KOSPI", "weight": 42.9},
+        {"ticker": "023530", "name": "롯데쇼핑", "marketCap": 250000, "change": -0.70, "market": "KOSPI", "weight": 35.7},
+        {"ticker": "282330", "name": "BGF리테일", "marketCap": 150000, "change": -0.10, "market": "KOSPI", "weight": 21.4}
+      ]
+    },
+    {
+      "code": "G2560",
+      "name": "교육서비스",
+      "totalMarketCap": 200000,
+      "avgChange": 0.90,
+      "stockCount": 3,
+      "stocks": [
+        {"ticker": "035900", "name": "JYP Ent.", "marketCap": 100000, "change": 1.50, "market": "KOSPI", "weight": 50.0},
+        {"ticker": "352820", "name": "하이브", "marketCap": 60000, "change": 0.30, "market": "KOSPI", "weight": 30.0},
+        {"ticker": "067160", "name": "아프리카TV", "marketCap": 40000, "change": 0.80, "market": "KOSDAQ", "weight": 20.0}
+      ]
+    },
+    {
+      "code": "G3520",
+      "name": "제약바이오와생명과학",
+      "totalMarketCap": 4800000,
+      "avgChange": -1.10,
+      "stockCount": 5,
+      "stocks": [
+        {"ticker": "207940", "name": "삼성바이오로직스", "marketCap": 2800000, "change": -0.80, "market": "KOSPI", "weight": 58.3},
+        {"ticker": "068270", "name": "셀트리온", "marketCap": 1200000, "change": -1.50, "market": "KOSPI", "weight": 25.0},
+        {"ticker": "326030", "name": "SK바이오팜", "marketCap": 400000, "change": -1.20, "market": "KOSPI", "weight": 8.3},
+        {"ticker": "145020", "name": "휴젤", "marketCap": 250000, "change": 0.50, "market": "KOSDAQ", "weight": 5.2},
+        {"ticker": "196170", "name": "알테오젠", "marketCap": 150000, "change": -2.80, "market": "KOSDAQ", "weight": 3.1}
+      ]
+    },
+    {
+      "code": "G3510",
+      "name": "건강관리장비와서비스",
+      "totalMarketCap": 800000,
+      "avgChange": 0.35,
+      "stockCount": 3,
+      "stocks": [
+        {"ticker": "128940", "name": "한미약품", "marketCap": 350000, "change": 0.60, "market": "KOSPI", "weight": 43.8},
+        {"ticker": "185750", "name": "종근당", "marketCap": 250000, "change": 0.20, "market": "KOSPI", "weight": 31.3},
+        {"ticker": "003850", "name": "보령", "marketCap": 200000, "change": 0.10, "market": "KOSPI", "weight": 25.0}
+      ]
+    },
+    {
+      "code": "G1510",
+      "name": "소재",
+      "totalMarketCap": 3200000,
+      "avgChange": 0.52,
+      "stockCount": 4,
+      "stocks": [
+        {"ticker": "005490", "name": "POSCO홀딩스", "marketCap": 1500000, "change": 0.80, "market": "KOSPI", "weight": 46.9},
+        {"ticker": "051910", "name": "LG화학", "marketCap": 900000, "change": 0.30, "market": "KOSPI", "weight": 28.1},
+        {"ticker": "010130", "name": "고려아연", "marketCap": 500000, "change": 0.50, "market": "KOSPI", "weight": 15.6},
+        {"ticker": "006260", "name": "LS", "marketCap": 300000, "change": 0.20, "market": "KOSPI", "weight": 9.4}
+      ]
+    },
+    {
+      "code": "G1010",
+      "name": "에너지",
+      "totalMarketCap": 1100000,
+      "avgChange": -0.65,
+      "stockCount": 3,
+      "stocks": [
+        {"ticker": "096770", "name": "SK이노베이션", "marketCap": 600000, "change": -0.80, "market": "KOSPI", "weight": 54.5},
+        {"ticker": "267250", "name": "HD현대", "marketCap": 350000, "change": -0.30, "market": "KOSPI", "weight": 31.8},
+        {"ticker": "078930", "name": "GS", "marketCap": 150000, "change": -0.70, "market": "KOSPI", "weight": 13.6}
+      ]
+    },
+    {
+      "code": "G2010",
+      "name": "자본재",
+      "totalMarketCap": 4200000,
+      "avgChange": 0.95,
+      "stockCount": 5,
+      "stocks": [
+        {"ticker": "329180", "name": "HD현대중공업", "marketCap": 1500000, "change": 1.50, "market": "KOSPI", "weight": 35.7},
+        {"ticker": "009540", "name": "HD한국조선해양", "marketCap": 1000000, "change": 1.20, "market": "KOSPI", "weight": 23.8},
+        {"ticker": "010620", "name": "HD현대미포", "marketCap": 800000, "change": 0.80, "market": "KOSPI", "weight": 19.0},
+        {"ticker": "042670", "name": "HD현대인프라코어", "marketCap": 500000, "change": 0.30, "market": "KOSPI", "weight": 11.9},
+        {"ticker": "298040", "name": "효성중공업", "marketCap": 400000, "change": 0.50, "market": "KOSPI", "weight": 9.5}
+      ]
+    },
+    {
+      "code": "G2020",
+      "name": "상업서비스와공급품",
+      "totalMarketCap": 500000,
+      "avgChange": 0.15,
+      "stockCount": 3,
+      "stocks": [
+        {"ticker": "241560", "name": "두산밥캣", "marketCap": 250000, "change": 0.30, "market": "KOSPI", "weight": 50.0},
+        {"ticker": "034020", "name": "두산에너빌리티", "marketCap": 150000, "change": -0.10, "market": "KOSPI", "weight": 30.0},
+        {"ticker": "014680", "name": "한솔케미칼", "marketCap": 100000, "change": 0.20, "market": "KOSDAQ", "weight": 20.0}
+      ]
+    },
+    {
+      "code": "G2030",
+      "name": "운송",
+      "totalMarketCap": 1800000,
+      "avgChange": 0.42,
+      "stockCount": 4,
+      "stocks": [
+        {"ticker": "003490", "name": "대한항공", "marketCap": 800000, "change": 0.60, "market": "KOSPI", "weight": 44.4},
+        {"ticker": "028670", "name": "팬오션", "marketCap": 450000, "change": 0.30, "market": "KOSPI", "weight": 25.0},
+        {"ticker": "011200", "name": "HMM", "marketCap": 350000, "change": 0.20, "market": "KOSPI", "weight": 19.4},
+        {"ticker": "044450", "name": "KSS해운", "marketCap": 200000, "change": 0.50, "market": "KOSPI", "weight": 11.1}
+      ]
+    },
+    {
+      "code": "G3010",
+      "name": "식품과기본식료품소매",
+      "totalMarketCap": 600000,
+      "avgChange": -0.20,
+      "stockCount": 3,
+      "stocks": [
+        {"ticker": "004990", "name": "롯데지주", "marketCap": 250000, "change": -0.30, "market": "KOSPI", "weight": 41.7},
+        {"ticker": "005440", "name": "현대그린푸드", "marketCap": 200000, "change": 0.10, "market": "KOSPI", "weight": 33.3},
+        {"ticker": "001680", "name": "대상", "marketCap": 150000, "change": -0.40, "market": "KOSPI", "weight": 25.0}
+      ]
+    },
+    {
+      "code": "G3020",
+      "name": "식품음료와담배",
+      "totalMarketCap": 1600000,
+      "avgChange": 0.18,
+      "stockCount": 4,
+      "stocks": [
+        {"ticker": "097950", "name": "CJ제일제당", "marketCap": 600000, "change": 0.30, "market": "KOSPI", "weight": 37.5},
+        {"ticker": "033780", "name": "KT&G", "marketCap": 500000, "change": 0.10, "market": "KOSPI", "weight": 31.3},
+        {"ticker": "271560", "name": "오리온", "marketCap": 300000, "change": 0.20, "market": "KOSPI", "weight": 18.8},
+        {"ticker": "005300", "name": "롯데칠성", "marketCap": 200000, "change": -0.10, "market": "KOSPI", "weight": 12.5}
+      ]
+    },
+    {
+      "code": "G3030",
+      "name": "가정용품과개인용품",
+      "totalMarketCap": 900000,
+      "avgChange": -0.35,
+      "stockCount": 3,
+      "stocks": [
+        {"ticker": "090430", "name": "아모레퍼시픽", "marketCap": 450000, "change": -0.50, "market": "KOSPI", "weight": 50.0},
+        {"ticker": "051900", "name": "LG생활건강", "marketCap": 300000, "change": -0.20, "market": "KOSPI", "weight": 33.3},
+        {"ticker": "214370", "name": "케어젠", "marketCap": 150000, "change": -0.30, "market": "KOSDAQ", "weight": 16.7}
+      ]
+    },
+    {
+      "code": "G5010",
+      "name": "전기통신서비스",
+      "totalMarketCap": 1400000,
+      "avgChange": 0.22,
+      "stockCount": 3,
+      "stocks": [
+        {"ticker": "017670", "name": "SK텔레콤", "marketCap": 700000, "change": 0.30, "market": "KOSPI", "weight": 50.0},
+        {"ticker": "030200", "name": "KT", "marketCap": 400000, "change": 0.10, "market": "KOSPI", "weight": 28.6},
+        {"ticker": "032640", "name": "LG유플러스", "marketCap": 300000, "change": 0.20, "market": "KOSPI", "weight": 21.4}
+      ]
+    },
+    {
+      "code": "G5020",
+      "name": "미디어와엔터테인먼트",
+      "totalMarketCap": 700000,
+      "avgChange": 1.50,
+      "stockCount": 4,
+      "stocks": [
+        {"ticker": "352820", "name": "하이브", "marketCap": 250000, "change": 2.00, "market": "KOSPI", "weight": 35.7},
+        {"ticker": "035900", "name": "JYP Ent.", "marketCap": 200000, "change": 1.80, "market": "KOSPI", "weight": 28.6},
+        {"ticker": "041510", "name": "에스엠", "marketCap": 150000, "change": 0.80, "market": "KOSPI", "weight": 21.4},
+        {"ticker": "067160", "name": "아프리카TV", "marketCap": 100000, "change": 1.20, "market": "KOSDAQ", "weight": 14.3}
+      ]
+    },
+    {
+      "code": "G5510",
+      "name": "유틸리티",
+      "totalMarketCap": 1300000,
+      "avgChange": -0.28,
+      "stockCount": 3,
+      "stocks": [
+        {"ticker": "015760", "name": "한국전력", "marketCap": 800000, "change": -0.30, "market": "KOSPI", "weight": 61.5},
+        {"ticker": "034020", "name": "두산에너빌리티", "marketCap": 300000, "change": -0.20, "market": "KOSPI", "weight": 23.1},
+        {"ticker": "036460", "name": "한국가스공사", "marketCap": 200000, "change": -0.30, "market": "KOSPI", "weight": 15.4}
+      ]
+    }
+  ]
+}

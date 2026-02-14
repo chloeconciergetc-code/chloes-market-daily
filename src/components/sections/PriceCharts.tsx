@@ -13,7 +13,7 @@ export function PriceCharts({ kospi, kosdaq }: {
   return (
     <div className="space-y-4">
       <SectionHeader title="지수 차트" subtitle="Price Action" />
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="space-y-4">
         {kospi && (
           <Card>
             <IndexCandlestickChart data={kospi} label="KOSPI" height={280} />
@@ -24,12 +24,12 @@ export function PriceCharts({ kospi, kosdaq }: {
             <IndexCandlestickChart data={kosdaq} label="KOSDAQ" height={280} />
           </Card>
         )}
+        {kospi && kosdaq && (
+          <Card>
+            <IndexOverlayChart kospi={kospi} kosdaq={kosdaq} height={280} />
+          </Card>
+        )}
       </div>
-      {kospi && kosdaq && (
-        <Card>
-          <IndexOverlayChart kospi={kospi} kosdaq={kosdaq} height={240} />
-        </Card>
-      )}
     </div>
   )
 }

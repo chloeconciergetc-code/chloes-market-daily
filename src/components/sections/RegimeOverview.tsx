@@ -213,7 +213,7 @@ export function RegimeOverview({ regime, kospi, kosdaq, summary, breadth }: {
 
       {/* Stats Grid */}
       {summary && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
           <StatCard
             label="ADR"
             value={summary.latest.adr.toFixed(1)}
@@ -239,7 +239,13 @@ export function RegimeOverview({ regime, kospi, kosdaq, summary, breadth }: {
             label="52주 신고가"
             value={lastBreadth ? `${lastBreadth.newHighs}` : '—'}
             unit="종목"
-            signal={lastBreadth ? (lastBreadth.spread > 10 ? 'green' : lastBreadth.spread < -10 ? 'red' : 'yellow') : undefined}
+            signal={lastBreadth ? (lastBreadth.newHighs > 50 ? 'green' : lastBreadth.newHighs < 10 ? 'red' : 'yellow') : undefined}
+          />
+          <StatCard
+            label="52주 신저가"
+            value={lastBreadth ? `${lastBreadth.newLows}` : '—'}
+            unit="종목"
+            signal={lastBreadth ? (lastBreadth.newLows < 10 ? 'green' : lastBreadth.newLows > 50 ? 'red' : 'yellow') : undefined}
           />
         </div>
       )}

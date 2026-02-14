@@ -8,6 +8,7 @@ import newHighJson from '../data/scanner-newhigh.json'
 import newLowJson from '../data/scanner-newlow.json'
 import investorFlowJson from '../data/investor-flow.json'
 import marketRegimeJson from '../data/market-regime.json'
+import wicsHeatmapJson from '../data/wics-heatmap.json'
 
 const dataMap: Record<string, unknown> = {
   'meta.json': metaJson,
@@ -20,6 +21,7 @@ const dataMap: Record<string, unknown> = {
   'scanner-newlow.json': newLowJson,
   'investor-flow.json': investorFlowJson,
   'market-regime.json': marketRegimeJson,
+  'wics-heatmap.json': wicsHeatmapJson,
 }
 
 export function useData<T>(file: string): T | null {

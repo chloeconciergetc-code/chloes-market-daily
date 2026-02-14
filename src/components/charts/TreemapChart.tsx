@@ -1,20 +1,24 @@
 import { useState, useRef, useCallback } from 'react'
 import { squarify } from '../../lib/squarify'
-
-interface HeatmapItem {
-  name: string
-  value: number
-  change: number
-}
+import type { LayoutRect } from '../../lib/squarify'
+import type { HeatmapStock } from '../../types/market'
 
 interface TooltipState {
   name: string
+  ticker: string
   change: number
+  sector: string
+  value: number
   x: number
   y: number
 }
 
-export function TreemapChart({ data, height = 360 }: { data: HeatmapItem[]; height?: number }) {
+function fmtCap(v: number): string {
+  if (v >= 10000) return `${(v / 10000).toFixed(1)}조`
+  return `${v.toLocaleString()}억`
+}
+
+export function TreemapChart({ data, height = 360, onItemClick }: { data: HeatmapStock[]; height?: number; onItemClick?: (item: LayoutRect) => void }) {
   const [tooltip, setTooltip] = useState<TooltipState | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const [containerWidth, setContainerWidth] = useState(800)
@@ -57,33 +61,35 @@ export function TreemapChart({ data, height = 360 }: { data: HeatmapItem[]; heig
             ? `rgba(239, 68, 68, ${0.45 + intensity * 0.35})`
             : 'rgba(255,255,255,0.03)'
 
-          const showText = w > 44 && h > 26
-          const showChange = w > 52 && h > 36
-          const maxChars = w > 80 ? 12 : 7
+          const showText = w > 36 && h > 22
+          const showChange = w > 48 && h > 34
+          const nameFontSize = w > 120 ? 13 : w > 80 ? 11 : 10
+          const maxChars = w > 120 ? 10 : w > 80 ? 7 : 5
           const displayName = rect.name.length > maxChars ? rect.name.slice(0, maxChars - 1) + '…' : rect.name
 
           return (
             <g
               key={i}
-              onMouseEnter={(e) => setTooltip({ name: rect.name, change: rect.change, x: e.clientX, y: e.clientY })}
-              onMouseMove={(e) => setTooltip({ name: rect.name, change: rect.change, x: e.clientX, y: e.clientY })}
+              onMouseEnter={(e) => setTooltip({ name: rect.name, ticker: rect.ticker, change: rect.change, sector: rect.sector, value: rect.value, x: e.clientX, y: e.clientY })}
+              onMouseMove={(e) => setTooltip(prev => prev ? { ...prev, x: e.clientX, y: e.clientY } : null)}
               onMouseLeave={() => setTooltip(null)}
-              style={{ cursor: 'pointer' }}
+              onClick={() => onItemClick?.(rect)}
+              style={{ cursor: onItemClick ? 'pointer' : 'default' }}
             >
               <rect x={x} y={y} width={w} height={h} rx={rx}
                 fill={color} stroke="var(--bg-base)" strokeWidth={1} />
               {showText && (
-                <text x={x + w / 2} y={y + h / 2 - (showChange ? 5 : 0)}
+                <text x={x + w / 2} y={y + h / 2 - (showChange ? 6 : 0)}
                   textAnchor="middle" dominantBaseline="middle"
-                  fill="rgba(255,255,255,0.9)" fontSize={w > 80 ? 11 : 10} fontWeight={600}
+                  fill="rgba(255,255,255,0.95)" fontSize={nameFontSize} fontWeight={700}
                   fontFamily="var(--font-sans)">
                   {displayName}
                 </text>
               )}
               {showChange && (
-                <text x={x + w / 2} y={y + h / 2 + 9}
+                <text x={x + w / 2} y={y + h / 2 + 10}
                   textAnchor="middle" dominantBaseline="middle"
-                  fill="rgba(255,255,255,0.6)" fontSize={9} fontFamily="var(--font-mono)" fontWeight={600}>
+                  fill="rgba(255,255,255,0.7)" fontSize={10} fontFamily="var(--font-mono)" fontWeight={600}>
                   {rect.change > 0 ? '+' : ''}{rect.change.toFixed(1)}%
                 </text>
               )}
@@ -95,19 +101,28 @@ export function TreemapChart({ data, height = 360 }: { data: HeatmapItem[]; heig
       {/* Tooltip */}
       {tooltip && (
         <div
-          className="fixed z-50 pointer-events-none px-2.5 py-1.5 rounded-[var(--radius-sm)] font-mono fs-caption"
+          className="fixed z-50 pointer-events-none px-3 py-2 rounded-[var(--radius-md)]"
           style={{
-            left: tooltip.x + 12,
-            top: tooltip.y - 40,
+            left: tooltip.x + 14,
+            top: tooltip.y - 50,
             background: 'var(--bg-card)',
             border: '1px solid var(--border-default)',
             boxShadow: 'var(--shadow-elevated)',
           }}
         >
-          <div className="text-[var(--text-primary)] font-semibold mb-0.5" style={{ fontFamily: 'var(--font-sans)' }}>{tooltip.name}</div>
-          <div className={tooltip.change >= 0 ? 'text-[var(--color-up)]' : 'text-[var(--color-down)]'}>
-            {tooltip.change > 0 ? '+' : ''}{tooltip.change.toFixed(2)}%
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-[var(--text-primary)] font-semibold fs-body" style={{ fontFamily: 'var(--font-sans)' }}>{tooltip.name}</span>
+            <span className="text-[var(--text-muted)] font-mono fs-micro">{tooltip.ticker}</span>
           </div>
+          <div className="flex items-center gap-3">
+            <span className={`font-mono font-bold fs-body ${tooltip.change >= 0 ? 'text-[var(--color-up)]' : 'text-[var(--color-down)]'}`}>
+              {tooltip.change > 0 ? '+' : ''}{tooltip.change.toFixed(2)}%
+            </span>
+            <span className="text-[var(--text-tertiary)] font-mono fs-micro">
+              시총 {fmtCap(tooltip.value)}
+            </span>
+          </div>
+          <div className="text-[var(--text-muted)] fs-micro mt-0.5">{tooltip.sector}</div>
         </div>
       )}
     </div>

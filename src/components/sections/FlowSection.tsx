@@ -1,15 +1,10 @@
-import { useState } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
 import { scaleLinear } from 'd3-scale'
 import { fmtDateLabel } from '../../lib/format'
 import { Card } from '../ui/Card'
 import { SectionHeader } from '../ui/SectionHeader'
-import { TabGroup } from '../ui/TabGroup'
 import { AreaChart } from '../charts/AreaChart'
 import { CHART } from '../../lib/chartStyles'
 import type { InvestorFlowData, InvestorFlowDay, BreadthDay } from '../../types/market'
-
-type Market = 'kospi' | 'kosdaq'
 
 const colors = {
   foreign: CHART.colors.foreign,
@@ -18,7 +13,7 @@ const colors = {
 }
 
 /* ── Bar Chart (30 days default) ── */
-function FlowBarChart({ data, width = 600, height = 240 }: { data: InvestorFlowDay[]; width?: number; height?: number }) {
+function FlowBarChart({ data, label, width = 600, height = 280 }: { data: InvestorFlowDay[]; label: string; width?: number; height?: number }) {
   const sliced = data.slice(-30)
   if (!sliced.length) return null
   const margin = { top: 16, right: 8, left: 56, bottom: 28 }
@@ -31,54 +26,89 @@ function FlowBarChart({ data, width = 600, height = 240 }: { data: InvestorFlowD
   const barGroupW = innerW / sliced.length
   const barW = Math.max(3, barGroupW * 0.25)
 
+  const latest = sliced[sliced.length - 1]
+  const cum5 = sliced.slice(-5).reduce(
+    (acc, d) => ({ foreign: acc.foreign + d.foreign, institution: acc.institution + d.institution, individual: acc.individual + d.individual }),
+    { foreign: 0, institution: 0, individual: 0 }
+  )
+
+  const fmt = (v: number) => {
+    const sign = v >= 0 ? '+' : ''
+    if (Math.abs(v) >= 10000) return `${sign}${(v / 10000).toFixed(1)}조`
+    return `${sign}${v.toLocaleString()}억`
+  }
+
   return (
-    <svg viewBox={`0 0 ${width} ${height}`} className="w-full" preserveAspectRatio="xMidYMid meet">
-      <line x1={margin.left} x2={width - margin.right} y1={margin.top + yScale(0)} y2={margin.top + yScale(0)}
-        stroke={CHART.refLine.stroke} strokeWidth={1} />
+    <div>
+      {/* Header with label and summary */}
+      <div className="flex items-baseline gap-2 mb-3 flex-wrap">
+        <span className="font-semibold tracking-wide text-[var(--text-tertiary)] uppercase fs-caption">{label}</span>
+        {latest && (
+          <span className="text-[var(--text-muted)] font-mono fs-micro">
+            외국인 <span className={latest.foreign >= 0 ? 'text-[var(--color-up)]' : 'text-[var(--color-down)]'}>{fmt(latest.foreign)}</span>
+            <span className="mx-1">·</span>
+            기관 <span className={latest.institution >= 0 ? 'text-[var(--color-up)]' : 'text-[var(--color-down)]'}>{fmt(latest.institution)}</span>
+            <span className="mx-1">·</span>
+            개인 <span className={latest.individual >= 0 ? 'text-[var(--color-up)]' : 'text-[var(--color-down)]'}>{fmt(latest.individual)}</span>
+          </span>
+        )}
+      </div>
 
-      {[-absMax, -absMax / 2, 0, absMax / 2, absMax].map((v, i) => (
-        <text key={i} x={margin.left - 4} y={margin.top + yScale(v) + 3}
-          fill={CHART.axis.fill} fontSize={CHART.axis.fontSize} fontFamily={CHART.axis.fontFamily} textAnchor="end">
-          {(v / 10000).toFixed(v === 0 ? 0 : 1)}조
-        </text>
-      ))}
+      {/* Flow summary cards */}
+      <div className="grid grid-cols-3 gap-3 mb-4">
+        <FlowCard label="외국인" today={latest?.foreign ?? 0} cumulative={cum5.foreign} color={colors.foreign} />
+        <FlowCard label="기관" today={latest?.institution ?? 0} cumulative={cum5.institution} color={colors.institution} />
+        <FlowCard label="개인" today={latest?.individual ?? 0} cumulative={cum5.individual} color={colors.individual} />
+      </div>
 
-      {sliced.map((d, i) => {
-        const x = margin.left + i * barGroupW + barGroupW * 0.12
-        const zero = yScale(0) + margin.top
-        const labelInterval = Math.max(1, Math.ceil(sliced.length / 5))
-        const showLabel = i % labelInterval === 0 || i === sliced.length - 1
+      <svg viewBox={`0 0 ${width} ${height}`} className="w-full" preserveAspectRatio="xMidYMid meet">
+        <line x1={margin.left} x2={width - margin.right} y1={margin.top + yScale(0)} y2={margin.top + yScale(0)}
+          stroke={CHART.refLine.stroke} strokeWidth={1} />
 
-        const drawBar = (val: number, offset: number, color: string) => {
-          const h = Math.abs(yScale(0) - yScale(val))
-          const y = val >= 0 ? zero - h : zero
-          return <rect key={offset} x={x + offset * (barW + 1.5)} y={y} width={barW} height={Math.max(h, 1)} fill={color} opacity={0.8} rx={1.5} />
-        }
-
-        return (
-          <g key={d.date}>
-            {drawBar(d.foreign, 0, colors.foreign)}
-            {drawBar(d.institution, 1, colors.institution)}
-            {drawBar(d.individual, 2, colors.individual)}
-            {showLabel && (
-              <text x={x + barGroupW * 0.35} y={height - 4}
-                fill={CHART.axis.fill} fontSize={CHART.axis.fontSize} fontFamily={CHART.axis.fontFamily} textAnchor="middle">
-                {fmtDateLabel(d.date)}
-              </text>
-            )}
-          </g>
-        )
-      })}
-
-      <g transform={`translate(${margin.left + 2}, 10)`}>
-        {[['외국인', colors.foreign], ['기관', colors.institution], ['개인', colors.individual]].map(([label, c], i) => (
-          <g key={i} transform={`translate(${i * 60}, 0)`}>
-            <rect x={0} y={-4} width={8} height={8} fill={c as string} rx={2} />
-            <text x={12} y={4} fill="var(--text-secondary)" fontSize={10}>{label}</text>
-          </g>
+        {[-absMax, -absMax / 2, 0, absMax / 2, absMax].map((v, i) => (
+          <text key={i} x={margin.left - 4} y={margin.top + yScale(v) + 3}
+            fill={CHART.axis.fill} fontSize={CHART.axis.fontSize} fontFamily={CHART.axis.fontFamily} textAnchor="end">
+            {(v / 10000).toFixed(v === 0 ? 0 : 1)}조
+          </text>
         ))}
-      </g>
-    </svg>
+
+        {sliced.map((d, i) => {
+          const x = margin.left + i * barGroupW + barGroupW * 0.12
+          const zero = yScale(0) + margin.top
+          const labelInterval = Math.max(1, Math.ceil(sliced.length / 5))
+          const showLabel = i % labelInterval === 0 || i === sliced.length - 1
+
+          const drawBar = (val: number, offset: number, color: string) => {
+            const h = Math.abs(yScale(0) - yScale(val))
+            const y = val >= 0 ? zero - h : zero
+            return <rect key={offset} x={x + offset * (barW + 1.5)} y={y} width={barW} height={Math.max(h, 1)} fill={color} opacity={0.8} rx={1.5} />
+          }
+
+          return (
+            <g key={d.date}>
+              {drawBar(d.foreign, 0, colors.foreign)}
+              {drawBar(d.institution, 1, colors.institution)}
+              {drawBar(d.individual, 2, colors.individual)}
+              {showLabel && (
+                <text x={x + barGroupW * 0.35} y={height - 4}
+                  fill={CHART.axis.fill} fontSize={CHART.axis.fontSize} fontFamily={CHART.axis.fontFamily} textAnchor="middle">
+                  {fmtDateLabel(d.date)}
+                </text>
+              )}
+            </g>
+          )
+        })}
+
+        <g transform={`translate(${margin.left + 2}, 10)`}>
+          {[['외국인', colors.foreign], ['기관', colors.institution], ['개인', colors.individual]].map(([lbl, c], i) => (
+            <g key={i} transform={`translate(${i * 60}, 0)`}>
+              <rect x={0} y={-4} width={8} height={8} fill={c as string} rx={2} />
+              <text x={12} y={4} fill="var(--text-secondary)" fontSize={10}>{lbl}</text>
+            </g>
+          ))}
+        </g>
+      </svg>
+    </div>
   )
 }
 
@@ -110,62 +140,33 @@ export function FlowSection({ investorFlow, breadth }: {
   investorFlow?: InvestorFlowData
   breadth?: BreadthDay[]
 }) {
-  const [market, setMarket] = useState<Market>('kospi')
-
   if (!investorFlow && !breadth) return null
-
-  const flows = investorFlow ? (market === 'kospi' ? investorFlow.kospi : investorFlow.kosdaq) : []
-  const latest = flows[flows.length - 1]
-  const cum5 = flows.slice(-5).reduce(
-    (acc, d) => ({ foreign: acc.foreign + d.foreign, institution: acc.institution + d.institution, individual: acc.individual + d.individual }),
-    { foreign: 0, institution: 0, individual: 0 }
-  )
 
   const breadthData = breadth?.map(d => ({ date: d.date, value: d.aboveMa20Pct })) ?? []
   const spreadData = breadth?.map(d => ({ date: d.date, value: d.spread })) ?? []
 
   return (
-    <div className="space-y-4">
-      {/* Investor Flow */}
+    <div className="flex flex-col" style={{ gap: 'var(--section-gap)' }}>
+      {/* Investor Flow — KOSPI and KOSDAQ separately */}
       {investorFlow && (
         <div>
           <SectionHeader title="투자자별 매매동향" subtitle="Investor Flow" />
-          <Card>
-            <div className="flex items-center gap-1 mb-4">
-              <TabGroup
-                tabs={[{ key: 'kospi' as Market, label: 'KOSPI' }, { key: 'kosdaq' as Market, label: 'KOSDAQ' }]}
-                active={market}
-                onChange={setMarket}
-              />
-            </div>
-
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={market}
-                initial={{ opacity: 0, x: 10 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -10 }}
-                transition={{ duration: 0.2 }}
-              >
-                {latest && (
-                  <div className="grid grid-cols-3 gap-3 mb-4">
-                    <FlowCard label="외국인" today={latest.foreign} cumulative={cum5.foreign} color={colors.foreign} />
-                    <FlowCard label="기관" today={latest.institution} cumulative={cum5.institution} color={colors.institution} />
-                    <FlowCard label="개인" today={latest.individual} cumulative={cum5.individual} color={colors.individual} />
-                  </div>
-                )}
-                <FlowBarChart data={flows} />
-              </motion.div>
-            </AnimatePresence>
-          </Card>
+          <div className="space-y-4">
+            <Card>
+              <FlowBarChart data={investorFlow.kospi} label="KOSPI" />
+            </Card>
+            <Card>
+              <FlowBarChart data={investorFlow.kosdaq} label="KOSDAQ" />
+            </Card>
+          </div>
         </div>
       )}
 
-      {/* Breadth Charts */}
+      {/* Breadth Charts — vertical layout with proper spacing */}
       {breadth && breadth.length > 0 && (
         <div>
           <SectionHeader title="시장 폭 분석" subtitle="Breadth" />
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="space-y-4">
             <Card>
               <h3 className="font-semibold text-[var(--text-secondary)] mb-3 fs-body">
                 20일선 위 종목 비율 <span className="text-[var(--text-muted)] font-mono fs-micro">{breadth.length}일</span>
@@ -180,7 +181,7 @@ export function FlowSection({ investorFlow, breadth }: {
                   { value: 70, label: '과열', color: 'rgba(239,68,68,0.25)' },
                   { value: 30, label: '침체', color: 'rgba(34,197,94,0.25)' },
                 ]}
-                height={240}
+                height={280}
               />
             </Card>
             <Card>
@@ -192,7 +193,7 @@ export function FlowSection({ investorFlow, breadth }: {
                 color="var(--color-up)"
                 yFormat={v => `${v.toFixed(0)}`}
                 refLines={[{ value: 0 }]}
-                height={240}
+                height={280}
               />
             </Card>
           </div>

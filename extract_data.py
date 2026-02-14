@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Extract market data from PostgreSQL → public/data/ JSON files."""
-import json, os, sys
+import json, os, sys, time, urllib.request
 from datetime import date, timedelta, datetime
 from decimal import Decimal
 import psycopg2
@@ -20,6 +20,105 @@ def dump(name, data):
     with open(os.path.join(OUT, name), 'w') as f:
         json.dump(data, f, ensure_ascii=False, default=dec, indent=None)
     print(f"  ✓ {name}")
+
+WICS_API = 'https://www.wiseindex.com/Index/GetIndexComponets'
+WICS_LVL2_CODES = [
+    'G1010', 'G1510', 'G2010', 'G2020', 'G2030',
+    'G2510', 'G2520', 'G2530', 'G2550', 'G2560',
+    'G3010', 'G3020', 'G3030', 'G3510', 'G3520',
+    'G4010', 'G4020', 'G4030', 'G4040', 'G4050',
+    'G4510', 'G4520', 'G4530', 'G4535', 'G4540',
+    'G5010', 'G5020', 'G5510',
+]
+
+def extract_wics_heatmap(cur, latest):
+    """Fetch WICS LVL2 industry composition from API, merge with DB for change% and market type."""
+    print("Generating wics-heatmap.json...")
+    dt_str = latest.strftime('%Y%m%d')
+
+    # Step 1: Get stock change % from DB
+    cur.execute("""
+        WITH t AS (
+            SELECT ticker, close,
+                   LAG(close) OVER (PARTITION BY ticker ORDER BY trade_date) AS prev
+            FROM market.daily_bars
+            WHERE trade_date >= %s - INTERVAL '3 days' AND trade_date <= %s
+        )
+        SELECT ticker,
+               CASE WHEN prev > 0 THEN ROUND((close - prev) / prev * 100, 2) END AS chg_pct
+        FROM t WHERE prev IS NOT NULL
+    """, (latest, latest))
+    stock_changes = {r[0]: float(r[1]) if r[1] else 0 for r in cur.fetchall()}
+
+    # Step 2: Get market type (KOSPI/KOSDAQ) from DB
+    cur.execute("SELECT ticker, universe FROM market.universe_members")
+    stock_markets = {r[0]: r[1] for r in cur.fetchall()}
+
+    # Step 3: Fetch each LVL2 industry from WICS API
+    industries = []
+    for code in WICS_LVL2_CODES:
+        url = f'{WICS_API}?ceil_yn=0&dt={dt_str}&sec_cd={code}'
+        try:
+            req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                data = json.loads(resp.read().decode('utf-8'))
+        except Exception as e:
+            print(f"    ⚠ Failed to fetch {code}: {e}")
+            continue
+
+        items = data.get('list', [])
+        if not items:
+            print(f"    ⚠ No stocks for {code}")
+            continue
+
+        # Industry name from API (strip "WICS " prefix)
+        idx_name = items[0].get('IDX_NM_KOR', code)
+        if idx_name.startswith('WICS '):
+            idx_name = idx_name[5:]
+
+        stocks = []
+        for item in items:
+            ticker = item['CMP_CD']
+            # MKT_VAL from WICS API is in 백만원 (million KRW)
+            # Convert to 억원: divide by 100
+            mkt_val = float(item.get('MKT_VAL', 0)) / 100
+            stocks.append({
+                'ticker': ticker,
+                'name': item.get('CMP_KOR', ticker),
+                'marketCap': round(mkt_val, 0),
+                'change': stock_changes.get(ticker, 0),
+                'market': stock_markets.get(ticker, 'KOSPI'),
+                'weight': float(item.get('WGT', 0)),
+            })
+
+        if not stocks:
+            continue
+
+        total_cap = sum(s['marketCap'] for s in stocks)
+        avg_change = (sum(s['change'] * s['marketCap'] for s in stocks) / total_cap
+                      if total_cap > 0 else 0)
+
+        industries.append({
+            'code': code,
+            'name': idx_name,
+            'totalMarketCap': round(total_cap, 0),
+            'avgChange': round(avg_change, 2),
+            'stockCount': len(stocks),
+            'stocks': sorted(stocks, key=lambda s: -s['marketCap']),
+        })
+
+        print(f"    ✓ {code} {idx_name}: {len(stocks)} stocks")
+        time.sleep(0.3)  # rate limiting
+
+    dump("wics-heatmap.json", {
+        'date': latest.isoformat(),
+        'industries': industries,
+    })
+    # Also copy to src/data/ for static import
+    import shutil
+    src_data = os.path.join(os.path.dirname(__file__), 'src', 'data')
+    shutil.copy2(os.path.join(OUT, 'wics-heatmap.json'), os.path.join(src_data, 'wics-heatmap.json'))
+    print(f"    ✓ Copied to src/data/wics-heatmap.json")
 
 def main():
     conn = psycopg2.connect(**DB)
@@ -223,38 +322,30 @@ def main():
 
     theme_perf.sort(key=lambda x: -x['avgChg'])
     
-    # Treemap: sector-based
-    sector_map = {}
-    for ticker, info in classifications.items():
-        sector = info.get('sector', '기타')
-        if ticker in stock_returns and ticker in mcaps:
-            if sector not in sector_map:
-                sector_map[sector] = {"name": sector, "cap": 0, "chg_sum": 0, "count": 0, "stocks": []}
-            sector_map[sector]["cap"] += mcaps[ticker]
-            sector_map[sector]["chg_sum"] += stock_returns[ticker]["chg"]
-            sector_map[sector]["count"] += 1
-            if len(sector_map[sector]["stocks"]) < 5:
-                sector_map[sector]["stocks"].append({
-                    "ticker": ticker, "name": info['name'],
-                    "chg": stock_returns[ticker]["chg"], "cap": mcaps[ticker]
-                })
-    
-    treemap = []
-    for s in sector_map.values():
-        if s["count"] > 0:
-            treemap.append({
-                "name": s["name"], "cap": s["cap"],
-                "avgChg": round(s["chg_sum"] / s["count"], 2),
-                "count": s["count"],
-                "stocks": sorted(s["stocks"], key=lambda x: -x["cap"])
+    # Stock heatmap: top 50 individual stocks by market cap
+    stock_heatmap = []
+    for ticker in sorted(mcaps.keys(), key=lambda t: mcaps[t], reverse=True)[:50]:
+        if ticker in stock_returns:
+            name = classifications.get(ticker, {}).get('name', ticker)
+            sector = classifications.get(ticker, {}).get('sector', '기타')
+            # Try universe_members for name if not in classifications
+            if name == ticker:
+                cur.execute("SELECT name FROM market.universe_members WHERE ticker=%s LIMIT 1", (ticker,))
+                rn = cur.fetchone()
+                if rn: name = rn[0]
+            stock_heatmap.append({
+                "name": name,
+                "ticker": ticker,
+                "value": mcaps[ticker],
+                "change": stock_returns[ticker]["chg"],
+                "sector": sector
             })
-    treemap.sort(key=lambda x: -x["cap"])
 
     dump("themes.json", {
         "date": latest.isoformat(),
         "topThemes": theme_perf[:10],
         "bottomThemes": theme_perf[-5:] if len(theme_perf) > 5 else [],
-        "treemap": treemap[:20]
+        "heatmap": stock_heatmap
     })
 
     # ── scanner-newhigh.json ──
@@ -278,6 +369,9 @@ def main():
         })
     
     dump("scanner-newhigh.json", {"date": latest.isoformat(), "stocks": newhighs})
+
+    # ── wics-heatmap.json ──
+    extract_wics_heatmap(cur, latest)
 
     conn.close()
     print(f"\n✅ All data extracted for {latest}")

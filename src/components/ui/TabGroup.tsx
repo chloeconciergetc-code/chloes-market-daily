@@ -11,6 +11,7 @@ interface TabGroupProps<T extends string> {
   active: T
   onChange: (key: T) => void
   variant?: 'default' | 'colored'
+  layoutId?: string
 }
 
 const colorMap = {
@@ -18,7 +19,7 @@ const colorMap = {
   down: { bg: 'var(--color-down-soft)', text: 'var(--color-down)' },
 }
 
-export function TabGroup<T extends string>({ tabs, active, onChange, variant = 'default' }: TabGroupProps<T>) {
+export function TabGroup<T extends string>({ tabs, active, onChange, variant = 'default', layoutId = 'tab-pill' }: TabGroupProps<T>) {
   return (
     <div className="flex items-center gap-1">
       {tabs.map(tab => {
@@ -38,7 +39,7 @@ export function TabGroup<T extends string>({ tabs, active, onChange, variant = '
           >
             {isActive && (
               <motion.div
-                layoutId="tab-pill"
+                layoutId={layoutId}
                 className="absolute inset-0 rounded-[var(--radius-sm)]"
                 style={{ background: activeBg }}
                 transition={{ type: 'spring', bounce: 0.15, duration: 0.4 }}

@@ -15,7 +15,7 @@ export function Card({ children, className = '', noPad = false, tier = 'standard
   tier?: CardTier
 }) {
   return (
-    <div className={`relative overflow-hidden transition-all duration-[var(--duration-normal)] ${tierClasses[tier]} ${noPad ? '' : 'p-5'} ${className}`}>
+    <div className={`relative overflow-hidden transition-all duration-[var(--duration-normal)] ${tierClasses[tier]} ${noPad ? '' : 'p-5 md:p-6'} ${className}`}>
       {children}
     </div>
   )
